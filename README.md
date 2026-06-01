@@ -129,7 +129,14 @@ For detailed instructions, see the [Implementation Guide](docs/09_Implementation
 3. Flash the Receiver code to the Rover ESP32.
 4. Flash the Camera code to the ESP32-CAM.
 5. Launch the Web Dashboard (`index.html`).
+   *(Note: The dedicated Web Dashboard repository can be found here: [Diaster_Rover_Dashboard](https://github.com/Prolayjit-B14/Diaster_Rover_Dashboard))*
 
 ## 👥 Team
 
-Built with ❤️ by a team of 4 B.Tech Engineering Students. See [Team Details](docs/13_Team_Details.md) for more info.
+Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Students.
+
+**Contributors:**
+- [Prolayjit-B14](https://github.com/Prolayjit-B14)
+- [Arghya015](https://github.com/Arghya015)
+
+See [Team Details](docs/13_Team_Details.md) for full member info and academic details.
