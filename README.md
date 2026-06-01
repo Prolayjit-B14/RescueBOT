@@ -156,14 +156,10 @@ For detailed instructions, see the [Implementation Guide](docs/09_Implementation
 ## 👥 Team
 
 <div align="center">
-  <table>
-    <tr>
-      <td align="center"><img src="hackathon_gallery/team_selfie.jpg" height="200" alt="Team Selfie"><br><em>Hackathon Selfie</em></td>
-      <td align="center"><img src="hackathon_gallery/team_photo.jpg" height="200" alt="Team Photo"><br><em>Team BOT THINGS</em></td>
-      <td align="center"><img src="hackathon_gallery/zyro_event.jpg" height="200" alt="ZYRO Event Logo"><br><em>ZYRO 2026 Hackathon</em></td>
-      <td align="center"><img src="hackathon_gallery/zyro_swag.jpg" height="200" alt="ZYRO Swag"><br><em>Event Swag</em></td>
-    </tr>
-  </table>
+  <img src="hackathon_gallery/team_selfie.jpg" height="200" alt="Team Selfie">
+  <img src="hackathon_gallery/team_photo.jpg" height="200" alt="Team Photo">
+  <img src="hackathon_gallery/zyro_event.jpg" height="200" alt="ZYRO Event Logo">
+  <img src="hackathon_gallery/zyro_swag.jpg" height="200" alt="ZYRO Swag">
 </div>
 
 Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Students.
