@@ -177,3 +177,22 @@ Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Studen
 - Papan Cssius
 
 See [Team Details](docs/13_Team_Details.md) for full member info and academic details.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+Feel free to check out the [issues page](https://github.com/Prolayjit-B14/RescueBOT/issues) and our [CONTRIBUTING.md](CONTRIBUTING.md) guidelines.
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **ZYRO 2026 Hackathon**: For providing the platform and inspiration to build this prototype.
+- **Kalyani Government Engineering College (KGEC)**: For the resources and continued support.
+
+---
+<div align="center">
+  <i>"Built for a safer tomorrow."</i>
+</div>
