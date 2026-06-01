@@ -161,11 +161,16 @@ To understand the project in depth, please refer to our detailed documentation f
 
 For detailed instructions, see the [Implementation Guide](docs/09_Implementation.md) and [System Architecture](docs/07_System_Architecture.md).
 
-1. Clone this repository.
-2. Flash the Transmitter code to the Controller ESP32.
-3. Flash the Receiver code to the Rover ESP32.
-4. Flash the Camera code to the ESP32-CAM.
-5. Launch the Web Dashboard (`index.html`).
+1. Clone this repository to your local machine.
+2. **Drive Control via NRF24L01 (Arduino Side):**
+   - Flash `firmware/nrf_communication/tx.ino` to the **Remote Controller** (Arduino Nano).
+   - Flash `firmware/nrf_communication/rx.ino` to the **Rover Main Drive** (Arduino Nano).
+3. **Sensor Telemetry via LoRa (ESP32 Side):**
+   - Flash `firmware/lora_module/tx-lora.ino` to the **Rover Telemetry Node** (ESP32).
+   - Flash `firmware/lora_module/rx-lora.ino` to the **Base Station Receiver** (ESP32).
+4. **Visual Surveillance (ESP32-CAM Side):**
+   - Flash `firmware/cam_module/cam_module.ino` to the **Vision Node** (ESP32-CAM).
+5. Launch the Web Dashboard (`website/index.html`).
    *(Note: The dedicated Web Dashboard repository can be found here: [Diaster_Rover_Dashboard](https://github.com/Prolayjit-B14/Diaster_Rover_Dashboard))*
 
 ## 👥 Team
