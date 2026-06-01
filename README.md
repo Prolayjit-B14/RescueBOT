@@ -32,12 +32,17 @@ It is tailored to provide real-time situational awareness and physical manipulat
     <tr>
       <td align="center"><img src="demo/rover_demo_isometric_view.jpg" height="200" alt="Isometric View"><br><em>Isometric View</em></td>
       <td align="center"><img src="demo/rover_demo_front_view.jpg" height="200" alt="Front View"><br><em>Front View</em></td>
-      <td align="center"><a href="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4"><img src="demo/rover_demo.jpg" height="200" alt="Movement Test Video"></a><br><em>🎬 Movement Test (Click to Play)</em></td>
+      <td align="center"><img src="demo/rover_demo.jpg" height="200" alt="Demo Thumbnail"><br><em>Demo Thumbnail</em></td>
     </tr>
     <tr>
+      <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4" height="200" controls></video><br><em>Movement Test</em></td>
       <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/arm_camera_movement_demo.mp4" height="200" controls></video><br><em>Arm & Camera Demo</em></td>
       <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_test.mp4" height="200" controls></video><br><em>RescueBOT Test</em></td>
+    </tr>
+    <tr>
       <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_demo.mp4" height="200" controls></video><br><em>General Demo</em></td>
+      <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4" height="200" controls></video><br><em>Full Overview</em></td>
+      <td></td>
     </tr>
   </table>
 </div>
@@ -181,10 +186,14 @@ For detailed instructions, see the [Implementation Guide](docs/09_Implementation
 ## 👥 Team
 
 <div align="center">
-  <img src="hackathon_gallery/team_selfie.jpg" height="200" alt="Team Selfie">
-  <img src="hackathon_gallery/team_photo.jpg" height="200" alt="Team Photo">
-  <img src="hackathon_gallery/zyro_event.jpg" height="200" alt="ZYRO Event Logo">
-  <img src="hackathon_gallery/zyro_swag.jpg" height="200" alt="ZYRO Swag">
+  <table>
+    <tr>
+      <td align="center"><img src="hackathon_gallery/team_selfie.jpg" height="160" alt="Team Selfie"><br><em>Hackathon Selfie</em></td>
+      <td align="center"><img src="hackathon_gallery/team_photo.jpg" height="160" alt="Team Photo"><br><em>Team BOT THINGS</em></td>
+      <td align="center"><img src="hackathon_gallery/zyro_event.jpg" height="160" alt="ZYRO Event Logo"><br><em>ZYRO 2026 Hackathon</em></td>
+      <td align="center"><img src="hackathon_gallery/zyro_swag.jpg" height="160" alt="ZYRO Swag"><br><em>Event Swag</em></td>
+    </tr>
+  </table>
 </div>
 
 Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Students.
