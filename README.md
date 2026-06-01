@@ -42,7 +42,24 @@ It is tailored to provide real-time situational awareness and physical manipulat
 Check out our demonstration video from the hackathon:
 
 https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
+## 💻 Web Dashboard Interface
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="website/screenshots/home_page.png" height="200" alt="Home Page"><br><em>Home Page</em></td>
+      <td align="center"><img src="website/screenshots/dashboard_overview.png" height="200" alt="Dashboard Overview"><br><em>Dashboard Overview</em></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="website/screenshots/sensor_telemetry.png" height="200" alt="Sensor Telemetry"><br><em>Sensor Telemetry</em></td>
+      <td align="center"><img src="website/screenshots/map_view.png" height="200" alt="Map View"><br><em>Live GPS Map</em></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="website/screenshots/camera_feed.png" height="200" alt="Camera Feed"><br><em>Camera & AI Feed</em></td>
+      <td align="center"><img src="website/screenshots/alert_system.png" height="200" alt="Alert System"><br><em>System Alerts</em></td>
+    </tr>
+  </table>
+</div>
 ## ✨ Key Features
 
 - **🦾 Robotic Arm & Rover Platform**: Agile movement across rough terrain with a manipulator arm for moving debris or delivering payloads.
