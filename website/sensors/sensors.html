@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Field Sensor Telemetry</title>
+    <meta name="description" content="Real-time sensor telemetry from all deployed field modules — temperature, gas, IMU, GPS, proximity and more.">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');</script>
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="./sensors.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-mark">
+                <img src="../assets/logo.png" alt="RescueBOT" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">RescueBOT</span>
+                <span class="logo-ver">Emergency Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Operations</div>
+            <a href="../dashboard/dashboard.html" class="nav-item" data-tooltip="Overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="../camera/camera.html" class="nav-item" data-tooltip="Live Monitoring">
+                <i data-lucide="video"></i>
+                <span class="nav-label">Live Monitoring</span>
+            </a>
+            <a href="../map/map.html" class="nav-item" data-tooltip="Incident Map">
+                <i data-lucide="map-pin"></i>
+                <span class="nav-label">Incident Map</span>
+            </a>
+            <a href="../sensors/sensors.html" class="nav-item active" data-tooltip="Field Sensors">
+                <i data-lucide="activity"></i>
+                <span class="nav-label">Field Sensors</span>
+            </a>
+            <a href="../alerts/alerts.html" class="nav-item" data-tooltip="Alert Center">
+                <i data-lucide="bell-ring"></i>
+                <span class="nav-label">Alert Center</span>
+                <span class="nav-badge" id="sidebar-alert-count">0</span>
+            </a>
+
+            <div class="nav-section-label" style="margin-top:8px;">System</div>
+            <a href="../" class="nav-item" data-tooltip="Home">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ══ MAIN COLUMN ══════════════════════════════════════════ -->
+    <div class="main-column">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="nav-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="nav-title-group">
+                    <span class="nav-breadcrumb">RescueBOT / Operations</span>
+                    <h1 class="nav-page-title">Field Sensors</h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content page-enter">
+
+            <!-- SENSOR GRID -->
+            <div class="sensor-grid">
+
+                <!-- ① CAMERA STREAM DIAGNOSTICS -->
+                <div class="sensor-card camera-card" id="card-cam" style="--card-color:#3B82F6;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(59,130,246,0.08);">
+                                <i data-lucide="video" style="color:#3B82F6;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">Camera Stream</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-cam"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="camera-stats-grid">
+                            <div class="cam-main-val">
+                                <span class="sensor-big-val" id="val-fps">--</span>
+                                <span class="sensor-unit">FPS</span>
+                            </div>
+                            <div class="cam-diag-rows">
+                                <div class="diag-row">
+                                    <span class="diag-label">Resolution</span>
+                                    <span class="diag-val">VGA 640×480</span>
+                                </div>
+                                <div class="diag-row">
+                                    <span class="diag-label">Module Lens</span>
+                                    <span class="diag-val">OV2640 (2.0 MP)</span>
+                                </div>
+                                <div class="diag-row">
+                                    <span class="diag-label">Link Latency</span>
+                                    <span class="diag-val" id="val-cam-latency">-- ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ② GPS NAVIGATION HUD (TERMINAL STYLE) -->
+                <div class="sensor-card gps-card" id="card-gps" style="--card-color:#A78BFA;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(167,139,250,0.08);">
+                                <i data-lucide="satellite" style="color:#A78BFA;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">GPS Navigation</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-gps"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="gps-coordinates-hud terminal-theme">
+                            <div class="coord-row">
+                                <span class="coord-label">LATITUDE</span>
+                                <span class="coord-val font-mono" id="val-gps-lat">--</span>
+                            </div>
+                            <div class="coord-row">
+                                <span class="coord-label">LONGITUDE</span>
+                                <span class="coord-val font-mono" id="val-gps-lng">--</span>
+                            </div>
+                        </div>
+                        <div class="gps-stats-grid">
+                            <div class="gps-stat">
+                                <span class="gps-stat-lbl">Satellites</span>
+                                <span class="gps-stat-val" id="val-gps-sats">--</span>
+                            </div>
+                            <div class="gps-stat">
+                                <span class="gps-stat-lbl">Fix Mode</span>
+                                <span class="gps-stat-val" id="val-gps-status">--</span>
+                            </div>
+                            <div class="gps-stat" style="text-align:right;">
+                                <span class="gps-stat-lbl">HDOP</span>
+                                <span class="gps-stat-val" id="val-gps-hdop">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ③ MPU-6050 6-DOF IMU -->
+                <div class="sensor-card mpu-card" id="card-mpu" style="--card-color:#EC4899;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(236,72,153,0.08);">
+                                <i data-lucide="rotate-3d" style="color:#EC4899;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">MPU-6050 IMU</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-mpu"></span>
+                    </div>
+                    <div class="sensor-value-section mpu-layout">
+                        <div class="bubble-level-wrap" id="bubble-level-wrap">
+                            <div class="bubble-crosshair-v" id="bubble-cross-v"></div>
+                            <div class="bubble-crosshair-h" id="bubble-cross-h"></div>
+                            <div class="bubble-level-ring ring-1"></div>
+                            <div class="bubble-level-ring ring-2"></div>
+                            <div class="bubble-dot" id="bubble-level-dot"></div>
+                        </div>
+                        <div class="mpu-measurements" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                            <div class="mpu-group" style="margin-bottom: 0;">
+                                <span class="mpu-group-label" style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: var(--space-2);">Attitude (X / Y Tilt)</span>
+                                <div class="mpu-sub-grid" style="display: grid; grid-template-columns: 1fr; gap: var(--space-2);">
+                                    <div style="background: var(--bg-elevated); padding: var(--space-3); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">X</span>
+                                        <span class="val font-mono" id="val-pitch" style="font-size: 18px; font-weight: 700; color: var(--text-heading);">--°</span>
+                                    </div>
+                                    <div style="background: var(--bg-elevated); padding: var(--space-3); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Y</span>
+                                        <span class="val font-mono" id="val-roll" style="font-size: 18px; font-weight: 700; color: var(--text-heading);">--°</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ④ SEISMIC / VIBRATION SENSOR -->
+                <div class="sensor-card vib-card" id="card-vib" style="--card-color:#10B981;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(16,185,129,0.08);">
+                                <i data-lucide="activity" style="color:#10B981;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">Seismic Vibration</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-vib"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="vib-value-row">
+                            <span class="sensor-big-val" id="val-vib">--</span>
+                            <span class="sensor-unit">% Intensity</span>
+                        </div>
+                        <div class="seismic-wave-wrap" id="seismic-wave-wrap">
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                            <div class="seismic-bar" style="height: 10%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⑤ IR FLAME DETECTOR -->
+                <div class="sensor-card fire-card" id="card-fire" style="--card-color:#EF4444;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(239,68,68,0.08);">
+                                <i data-lucide="flame" style="color:#EF4444;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">IR Flame Sensor</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-fire"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="fire-threat-wrap">
+                            <div class="fire-icon-pulsar" id="fire-icon-pulsar">
+                                <i data-lucide="flame" style="color:#EF4444; width:22px; height:22px;"></i>
+                            </div>
+                            <div class="fire-text-status" id="val-fire">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⑥ MQ-2 COMBUSTIBLE GAS -->
+                <div class="sensor-card gas-card" id="card-gas" style="--card-color:#F59E0B;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(245,158,11,0.08);">
+                                <i data-lucide="wind" style="color:#F59E0B;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">Combustible Gas</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-gas"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="gas-value-row">
+                            <span class="sensor-big-val" id="val-gas">--</span>
+                            <span class="sensor-unit">ppm</span>
+                        </div>
+                        <div class="gas-equalizer" id="gas-equalizer">
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                            <div class="eq-segment"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:8px 10px;background:var(--bg-elevated);border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <i data-lucide="cloud-fog" style="width:14px;height:14px;color:var(--text-muted);"></i>
+                                <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Smoke</span>
+                            </div>
+                            <span class="badge" id="smoke-status-badge-sensors" style="font-size:10px;">CLEAR</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- ⑧ ULTRASONIC RANGE SENSOR -->
+                <div class="sensor-card ultrasonic-card" id="card-ultrasonic" style="--card-color:#6366F1;">
+                    <div class="sensor-card-header">
+                        <div class="sensor-icon-label">
+                            <div class="sensor-icon" style="background:rgba(99,102,241,0.08);">
+                                <i data-lucide="move-horizontal" style="color:#6366F1;"></i>
+                            </div>
+                            <div>
+                                <div class="sensor-name">Proximity Range</div>
+                            </div>
+                        </div>
+                        <span class="badge" id="status-ultrasonic"></span>
+                    </div>
+                    <div class="sensor-value-section">
+                        <div class="proximity-visual-container">
+                            <div class="proximity-arch arch-red" id="arch-red"></div>
+                            <div class="proximity-arch arch-amber" id="arch-amber"></div>
+                            <div class="proximity-arch arch-green" id="arch-green"></div>
+                            <div class="proximity-rover-symbol">
+                                <i data-lucide="shield" style="width:20px;height:20px;color:var(--text-muted);"></i>
+                            </div>
+                        </div>
+                        <div class="proximity-value-display">
+                            <span class="sensor-big-val" id="val-ultrasonic">--</span>
+                            <span class="sensor-unit">cm Range</span>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="../shared/mqtt-client.js"></script>
+<script type="module" src="../shared/shared.js"></script>
+<script type="module" src="./sensors.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
+

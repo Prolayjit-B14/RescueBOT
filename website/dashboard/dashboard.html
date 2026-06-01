@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Operations Overview</title>
+    <meta name="description" content="Real-time operational overview — rover telemetry, GPS tracking, environmental monitoring and alert management.">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');</script>
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="./dashboard.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-mark">
+                <img src="../assets/logo.png" alt="RescueBOT" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">RescueBOT</span>
+                <span class="logo-ver">Emergency Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Operations</div>
+            <a href="./dashboard.html" class="nav-item active" data-tooltip="Overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="../camera/camera.html" class="nav-item" data-tooltip="Live Monitoring">
+                <i data-lucide="video"></i>
+                <span class="nav-label">Live Monitoring</span>
+            </a>
+            <a href="../map/map.html" class="nav-item" data-tooltip="Incident Map">
+                <i data-lucide="map-pin"></i>
+                <span class="nav-label">Incident Map</span>
+            </a>
+            <a href="../sensors/sensors.html" class="nav-item" data-tooltip="Field Sensors">
+                <i data-lucide="activity"></i>
+                <span class="nav-label">Field Sensors</span>
+            </a>
+            <a href="../alerts/alerts.html" class="nav-item" data-tooltip="Alert Center">
+                <i data-lucide="bell-ring"></i>
+                <span class="nav-label">Alert Center</span>
+                <span class="nav-badge" id="sidebar-alert-count">0</span>
+            </a>
+
+            <div class="nav-section-label" style="margin-top:8px;">System</div>
+            <a href="../" class="nav-item" data-tooltip="Home">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ══ MAIN COLUMN ══════════════════════════════════════════ -->
+    <div class="main-column">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="nav-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="nav-title-group">
+                    <span class="nav-breadcrumb">RescueBOT / Operations</span>
+                    <h1 class="nav-page-title">Overview</h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="status-group">
+                    <div class="status-item" id="rover-status-pill" style="padding: 0 var(--space-2); height: 28px; display: flex; align-items: center; justify-content: center;">
+                        <div class="status-dot" id="rover-conn-dot" style="margin: 0;"></div>
+                    </div>
+                </div>
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="page-content page-enter" style="padding: 0;">
+            <div class="bento-grid">
+                
+                <!-- CAMERA (Large) -->
+                <div class="bento-card bento-cam">
+                    <div class="bento-header-overlay">
+                        <div class="live-indicator">
+                            <div class="live-dot standby" id="cam-live-dot"></div>
+                            <span id="cam-live-label" style="font-weight: 600; font-size: 11px; letter-spacing: 0.05em;">STANDBY</span>
+                        </div>
+                        <a href="../camera/camera.html" class="bento-action-icon" title="Full Camera"><i data-lucide="external-link"></i></a>
+                    </div>
+                    <div class="bento-body-full">
+                        <img id="cam-stream-thumb" src="" alt="Camera Stream" crossorigin="anonymous" style="display:none;width:100%;height:100%;object-fit:cover;">
+                        <div class="cam-placeholder" id="cam-placeholder">
+                            <i data-lucide="video-off"></i>
+                            <span>Awaiting feed...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAP (Large) -->
+                <div class="bento-card bento-map">
+                    <div class="bento-header-overlay">
+                        <div class="header-title" style="display: flex; align-items: center; gap: 8px; color: white; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+                            <i data-lucide="map-pin" style="color: var(--accent);"></i> Live Position
+                        </div>
+                        <a href="../map/map.html" class="bento-action-icon" title="Full Map"><i data-lucide="maximize-2"></i></a>
+                    </div>
+                    <div id="mini-map-container" class="bento-body-full"></div>
+                </div>
+
+                <!-- ROVER STATUS -->
+                <div class="bento-card bento-status">
+                    <div class="bento-header">
+                        <span class="bento-title">System Status</span>
+                        <i data-lucide="cpu" style="color: var(--status-ok);"></i>
+                    </div>
+                    <div class="bento-content centered-content">
+                        <div class="status-orb" id="rover-beacon"></div>
+                        <h3 id="rover-status-text">Rover Online</h3>
+                        <p class="subtitle">Unit ARES-1 &middot; ESP32-CAM</p>
+                        <div class="badges">
+                            <span class="badge badge-green" id="rover-badge">Online</span>
+                            <span class="badge badge-blue">MQTT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POWER SYSTEM -->
+                <div class="bento-card bento-power">
+                    <div class="bento-header">
+                        <span class="bento-title">Power Core</span>
+                        <span class="badge badge-green" id="batt-status">Nominal</span>
+                    </div>
+                    <div class="bento-content row-content">
+                        <div class="batt-ring-container">
+                            <svg width="60" height="60" viewBox="0 0 100 100">
+                                <circle class="batt-bg" cx="50" cy="50" r="42" fill="none" stroke-width="4"/>
+                                <circle class="batt-fill" id="batt-ring" cx="50" cy="50" r="42" fill="none" stroke-width="4" stroke-dasharray="263.89" stroke-dashoffset="65.97"/>
+                            </svg>
+                            <div class="batt-val" id="val-battery">75%</div>
+                        </div>
+                        <div class="batt-stats">
+                            <div class="stat-line"><span class="lbl">Volts</span><span class="val" id="val-voltage">-- V</span></div>
+                            <div class="stat-line"><span class="lbl">RSSI</span><span class="val" id="val-rssi">-- dBm</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMU ATTITUDE (New!) -->
+                <div class="bento-card bento-imu">
+                    <div class="bento-header">
+                        <span class="bento-title">IMU Attitude</span>
+                        <i data-lucide="compass" style="color: #EC4899;"></i>
+                    </div>
+                    <div class="bento-content row-content" style="gap: 16px;">
+                        <div class="bubble-level-wrap" id="bubble-level-wrap">
+                            <div class="bubble-crosshair-v" id="bubble-cross-v"></div>
+                            <div class="bubble-crosshair-h" id="bubble-cross-h"></div>
+                            <div class="bubble-dot" id="bubble-level-dot"></div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:4px; flex:1; font-size:11px; justify-content:center;">
+                            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted); font-weight: 500;">X</span><span class="val font-mono" id="val-pitch" style="font-weight:600; color:var(--text-primary);">0.0°</span></div>
+                            <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted); font-weight: 500;">Y</span><span class="val font-mono" id="val-roll" style="font-weight:600; color:var(--text-primary);">0.0°</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEISMIC ACTIVITY (New!) -->
+                <div class="bento-card bento-vib">
+                    <div class="bento-header">
+                        <span class="bento-title">Seismic Activity</span>
+                        <i data-lucide="activity" style="color: #10B981;"></i>
+                    </div>
+                    <div class="bento-content list-content">
+                        <div class="env-row" style="border-bottom:none; padding-bottom:0;">
+                            <span class="env-lbl">Vibration</span>
+                            <span class="env-val" style="font-family:var(--font-mono); font-weight:700; color:var(--status-ok);"><span id="val-vib">0%</span></span>
+                        </div>
+                        <div class="seismic-wave-wrap" id="seismic-wave-wrap">
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:10%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:12%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:15%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:8%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:10%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:20%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:14%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:8%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:12%;"></div>
+                            <div class="seismic-bar" style="width:6%; background:var(--status-ok); min-height:2px; height:16%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ULTRASONIC DISTANCE SENSOR -->
+                <div class="bento-card bento-env">
+                    <div class="bento-header">
+                        <span class="bento-title">Ultrasonic Distance</span>
+                        <i data-lucide="radar" style="color: var(--accent);"></i>
+                    </div>
+                    <div class="bento-content centered-content" style="gap: 6px;">
+                        <div style="display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:var(--accent-muted);border:2px solid var(--accent-border);margin-bottom:4px;">
+                            <i data-lucide="radio" style="width:28px;height:28px;color:var(--accent);"></i>
+                        </div>
+                        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-bright);line-height:1;" id="val-ultrasonic-big">--</div>
+                        <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);">centimeters</div>
+                        <div class="badges" style="margin-top:6px;">
+                            <span class="badge badge-blue" id="ultrasonic-range-badge">MEASURING</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MQ-2 GAS & SMOKE SENSOR -->
+                <div class="bento-card bento-telemetry">
+                    <div class="bento-header">
+                        <span class="bento-title">MQ-2 Gas &amp; Smoke</span>
+                        <i data-lucide="wind" style="color: var(--status-warn);"></i>
+                    </div>
+                    <div class="bento-content list-content">
+                        <div class="env-row">
+                            <i data-lucide="flame" style="color:var(--status-warn);flex-shrink:0;"></i>
+                            <span class="env-lbl">Gas (ppm)</span>
+                            <span class="env-val" style="font-family:var(--font-mono);font-weight:700;color:var(--accent-bright);"><span id="val-gas">--</span></span>
+                        </div>
+                        <div style="margin:2px 0 6px;">
+                            <div style="height:4px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;">
+                                <div id="bar-gas-mq2" style="height:100%;width:0%;background:linear-gradient(90deg,var(--status-ok),var(--status-warn),var(--status-danger));border-radius:2px;transition:width 0.4s ease;"></div>
+                            </div>
+                        </div>
+                        <div class="env-row">
+                            <i data-lucide="cloud-fog" style="color:var(--text-muted);flex-shrink:0;"></i>
+                            <span class="env-lbl">Smoke</span>
+                            <span class="env-val">
+                                <span class="badge" id="smoke-status-badge" style="font-size:10px;">CLEAR</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TELEMETRY / KINEMATICS -->
+                <div class="bento-card bento-kinematics">
+                    <div class="bento-header">
+                        <span class="bento-title">Kinematics</span>
+                        <i data-lucide="compass" style="color: #8B5CF6;"></i>
+                    </div>
+                    <div class="bento-content list-content">
+                         <div class="env-row">
+                            <span class="env-lbl">Speed</span>
+                            <span class="env-val" id="val-speed">0.0 <small>km/h</small></span>
+                        </div>
+                        <div class="env-row">
+                            <span class="env-lbl">Tilt</span>
+                            <span class="env-val"><span id="val-tilt">0</span>°</span>
+                        </div>
+                        <div class="env-row">
+                            <span class="env-lbl">Distance</span>
+                            <span class="env-val"><span id="val-ultrasonic">--</span> cm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS -->
+                <div class="bento-card bento-actions">
+                    <div class="bento-header">
+                        <span class="bento-title">Command Dispatch</span>
+                        <i data-lucide="terminal" style="color: var(--text-muted);"></i>
+                    </div>
+                    <div class="bento-content actions-grid">
+                        <button class="bento-btn estop" id="btn-estop"><i data-lucide="octagon"></i> E-Stop</button>
+                        <button class="bento-btn auto" id="btn-auto"><i data-lucide="cpu"></i> Auto Mode</button>
+                        <button class="bento-btn home" id="btn-home"><i data-lucide="home"></i> Return Base</button>
+                    </div>
+                </div>
+
+                <!-- ACTIVE ALERTS -->
+                <div class="bento-card bento-alerts">
+                    <div class="bento-header">
+                        <span class="bento-title">Active Alerts</span>
+                        <a href="../alerts/alerts.html" class="view-all">View All</a>
+                    </div>
+                    <div class="bento-content alerts-list">
+                        <div class="alert-pill ok"><i data-lucide="check-circle-2"></i> <span id="alert-gas-text">Gas Normal</span></div>
+                        <div class="alert-pill ok"><i data-lucide="check-circle-2"></i> <span id="alert-smoke-text">Smoke Clear</span></div>
+                        <div class="alert-pill ok"><i data-lucide="check-circle-2"></i> <span id="alert-fire-text">No Fire</span></div>
+                        <div class="alert-pill ok"><i data-lucide="radio"></i> <span id="alert-ultrasonic-text">Distance OK</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="../shared/mqtt-client.js"></script>
+<script type="module" src="../shared/shared.js"></script>
+<script type="module" src="./dashboard.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
+

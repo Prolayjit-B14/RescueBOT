@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Live Monitoring</title>
+    <meta name="description" content="Real-time AI-powered survivor intelligence, fire detection, and rescue priority ranking.">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');</script>
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="./camera.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-mark">
+                <img src="../assets/logo.png" alt="RescueBOT" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">RescueBOT</span>
+                <span class="logo-ver">Emergency Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Operations</div>
+            <a href="../dashboard/dashboard.html" class="nav-item" data-tooltip="Overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="./camera.html" class="nav-item active" data-tooltip="Live Monitoring">
+                <i data-lucide="video"></i>
+                <span class="nav-label">Live Monitoring</span>
+            </a>
+            <a href="../map/map.html" class="nav-item" data-tooltip="Incident Map">
+                <i data-lucide="map-pin"></i>
+                <span class="nav-label">Incident Map</span>
+            </a>
+            <a href="../sensors/sensors.html" class="nav-item" data-tooltip="Field Sensors">
+                <i data-lucide="activity"></i>
+                <span class="nav-label">Field Sensors</span>
+            </a>
+            <a href="../alerts/alerts.html" class="nav-item" data-tooltip="Alert Center">
+                <i data-lucide="bell-ring"></i>
+                <span class="nav-label">Alert Center</span>
+                <span class="nav-badge" id="sidebar-alert-count">0</span>
+            </a>
+
+            <div class="nav-section-label" style="margin-top:8px;">System</div>
+            <a href="../" class="nav-item" data-tooltip="Home">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ══ MAIN COLUMN ══════════════════════════════════════════ -->
+    <div class="main-column">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="nav-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="nav-title-group">
+                    <span class="nav-breadcrumb">RescueBOT / Operations</span>
+                    <h1 class="nav-page-title">Live Monitoring</h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="status-group">
+                    <div class="status-item" style="padding: 0 var(--space-2); height: 28px; display: flex; align-items: center; justify-content: center;">
+                        <div class="live-dot standby" id="cam-rec-dot" style="margin: 0;"></div>
+                    </div>
+                </div>
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content page-enter" style="padding: 0;">
+
+            <!-- CAMERA SHELL -->
+            <div class="camera-shell">
+
+            <!-- ── SCENE HAZARD BANNER ─────────────────────────── -->
+            <div class="scene-hazard-banner" id="scene-hazard-banner" style="display:none;">
+                <div class="hazard-banner-inner">
+                    <div class="hazard-icon"><i data-lucide="alert-triangle"></i></div>
+                    <div class="hazard-content">
+                        <span class="hazard-title" id="hazard-banner-title">CRITICAL HAZARD DETECTED</span>
+                        <span class="hazard-desc" id="hazard-banner-desc">Active fire + unconscious survivor in critical proximity</span>
+                    </div>
+                    <div class="hazard-tags">
+                        <span class="hazard-level-chip" id="hazard-level-chip">CRITICAL</span>
+                        <span class="hazard-survivors-chip" id="hazard-survivors-chip">0 Survivors</span>
+                    </div>
+                    <button class="hazard-close" id="hazard-banner-close">&#x2715;</button>
+                </div>
+            </div>
+
+
+            <!-- ── MAIN MONITORING CONTAINER ──────────────────── -->
+            <div class="camera-monitoring-container">
+
+                <!-- CENTER: CAMERA FEED CARD -->
+                <div class="monitoring-card">
+
+                    <!-- Stream Container -->
+                    <div class="main-feed-panel" id="main-feed-panel">
+                        <!-- Video -->
+                        <div class="feed-video-wrap">
+                            <img id="esp32-stream" class="feed-img immersive" src="" alt="ESP32 Camera Stream" crossorigin="anonymous" style="display:none;">
+                            <div class="feed-placeholder" id="feed-placeholder">
+                                <i data-lucide="video-off"></i>
+                                <span>Awaiting field signal</span>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Feed Controls -->
+                        <div class="monitoring-card-footer">
+                            <button class="feed-btn" id="btn-stream-toggle" title="Start / Stop Monitoring">
+                                <i data-lucide="play"></i>
+                            </button>
+                            <button class="feed-btn" id="btn-snapshot" title="Capture Snapshot">
+                                <i data-lucide="camera"></i>
+                            </button>
+                            <button class="feed-btn" id="btn-fullscreen" title="Expand View">
+                                <i data-lucide="maximize"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: CAM SIDEBAR -->
+                <div class="cam-sidebar">
+
+                    <!-- Vision Tuning (Collapsible) -->
+                    <details class="cam-sidebar-section collapsible" style="padding-bottom:0;">
+                        <summary class="section-title-row" style="margin-bottom:0;cursor:pointer;user-select:none;padding-bottom:var(--space-5);">
+                            <h3>
+                                Vision Tuning
+                                <i data-lucide="chevron-down" class="chevron-icon" style="width:13px;height:13px;color:var(--text-muted);"></i>
+                            </h3>
+                        </summary>
+                        <div class="tuning-row" style="padding-bottom:var(--space-5);">
+                            <!-- Stream Stats Grid -->
+                            <div class="env-risk-grid" style="margin-bottom: var(--space-4); grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                                <div class="env-risk-card" style="padding: 6px 8px;">
+                                    <div class="env-risk-label" style="font-size: 8px;">Stream Status</div>
+                                    <div class="env-risk-value" style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                        <span class="meta-dot live" id="rec-badge" style="width: 5px; height: 5px; border-radius: 50%; background: var(--status-ok);"></span>
+                                        Live
+                                    </div>
+                                </div>
+                                <div class="env-risk-card" style="padding: 6px 8px;">
+                                    <div class="env-risk-label" style="font-size: 8px;">AI Pipeline</div>
+                                    <div class="env-risk-value text-green" id="fps-badge" style="font-size: 11px; font-weight: 600;">Active</div>
+                                </div>
+                                <div class="env-risk-card" style="padding: 6px 8px;">
+                                    <div class="env-risk-label" style="font-size: 8px;">Latency</div>
+                                    <div class="env-risk-value" id="latency-badge" style="font-size: 11px; font-weight: 600;">-- ms</div>
+                                </div>
+                                <div class="env-risk-card" style="padding: 6px 8px;">
+                                    <div class="env-risk-label" style="font-size: 8px;">Timestamp</div>
+                                    <div class="env-risk-value" id="hud-timestamp" style="font-size: 9px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">--</div>
+                                </div>
+                            </div>
+
+                            <div class="tuning-item">
+                                <div class="tuning-label-row">
+                                    <span class="tuning-label">Camera IP Override</span>
+                                </div>
+                                <div class="ip-row">
+                                    <input type="text" id="ctrl-camera-ip" class="tuning-text-input" placeholder="e.g. 192.168.1.100">
+                                    <button id="btn-apply-ip" class="ip-mount-btn">Mount</button>
+                                </div>
+                            </div>
+                            <div class="tuning-item">
+                                <div class="tuning-row-inline">
+                                    <span class="tuning-label">Resolution</span>
+                                    <select id="ctrl-resolution" class="tuning-select" style="width:auto;max-width:140px;">
+                                        <option value="7">QVGA (320×240)</option>
+                                        <option value="9" selected>VGA (640×480)</option>
+                                        <option value="11">SVGA (800×600)</option>
+                                        <option value="13">UXGA (1600×1200)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="tuning-item">
+                                <div class="tuning-row-inline">
+                                    <span class="tuning-label">Effect</span>
+                                    <select id="ctrl-effect" class="tuning-select" style="width:auto;max-width:140px;">
+                                        <option value="0" selected>Normal</option>
+                                        <option value="1">Negative</option>
+                                        <option value="2">Grayscale</option>
+                                        <option value="3">Red Tint</option>
+                                        <option value="4">Green Tint</option>
+                                        <option value="5">Blue Tint</option>
+                                        <option value="6">Sepia</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="tuning-item">
+                                <div class="tuning-label-row">
+                                    <span class="tuning-label">Brightness</span>
+                                    <span class="tuning-val" id="val-brightness">0</span>
+                                </div>
+                                <input type="range" id="ctrl-brightness" class="tuning-input" min="-2" max="2" value="0" step="1">
+                            </div>
+                            <div class="tuning-item">
+                                <div class="tuning-label-row">
+                                    <span class="tuning-label">Contrast</span>
+                                    <span class="tuning-val" id="val-contrast">0</span>
+                                </div>
+                                <input type="range" id="ctrl-contrast" class="tuning-input" min="-2" max="2" value="0" step="1">
+                            </div>
+                            <div class="tuning-item">
+                                <div class="tuning-label-row">
+                                    <span class="tuning-label">Flash LED</span>
+                                    <span class="tuning-val" id="val-led">0%</span>
+                                </div>
+                                <input type="range" id="ctrl-led" class="tuning-input" min="0" max="255" value="0" step="5">
+                            </div>
+                            <div class="switch-row">
+                                <label class="switch-label">
+                                    <input type="checkbox" id="ctrl-mirror" checked>
+                                    Mirror
+                                </label>
+                                <label class="switch-label">
+                                    <input type="checkbox" id="ctrl-flip" checked>
+                                    Flip
+                                </label>
+                                <label class="switch-label">
+                                    <input type="checkbox" id="ctrl-night">
+                                    Flash
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Rover Telemetry -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="navigation" style="width:14px;height:14px;color:var(--accent);"></i> Rover Telemetry</h3>
+                        </div>
+                        <div class="env-risk-grid">
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Latitude</div>
+                                <div class="env-risk-value" id="hud-lat">--</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Longitude</div>
+                                <div class="env-risk-value" id="hud-lng">--</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Speed</div>
+                                <div class="env-risk-value" id="hud-speed">-- m/s</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Heading</div>
+                                <div class="env-risk-value" id="hud-heading">--°</div>
+                            </div>
+                            <div class="env-risk-card" style="grid-column: span 2;">
+                                <div class="env-risk-label">Altitude</div>
+                                <div class="env-risk-value" id="hud-alt">-- m</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Temperature</div>
+                                <div class="env-risk-value" id="cam-hud-temp">-- °C</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Gas (ppm)</div>
+                                <div class="env-risk-value" id="cam-hud-gas">--</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Fire</div>
+                                <div class="env-risk-value" id="cam-hud-fire">CLEAR</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Vibration</div>
+                                <div class="env-risk-value" id="cam-hud-vib">--%</div>
+                            </div>
+                            <div class="env-risk-card" style="grid-column: span 2;">
+                                <div class="env-risk-label">Battery</div>
+                                <div class="env-risk-value" id="cam-hud-batt">--%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scene Summary -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="info" style="width:14px;height:14px;color:var(--accent);"></i> Scene Summary</h3>
+                        </div>
+                        <div class="env-risk-grid">
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Survivors</div>
+                                <div class="env-risk-value ss-value" id="ss-survivor-count">0</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Fire</div>
+                                <div class="env-risk-value ss-value ss-ok" id="ss-fire-state">CLEAR</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Smoke</div>
+                                <div class="env-risk-value ss-value ss-ok" id="ss-smoke-state">CLEAR</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Visibility</div>
+                                <div class="env-risk-value ss-value ss-ok" id="ss-visibility">HIGH</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Hazard Level</div>
+                                <div class="env-risk-value ss-value ss-hazard priority-low" id="ss-hazard-level">LOW</div>
+                            </div>
+                            <div class="env-risk-card">
+                                <div class="env-risk-label">Spread Risk</div>
+                                <div class="env-risk-value ss-value" id="ss-spread-risk">NONE</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Detection Array -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="scan" style="width:14px;height:14px;color:var(--accent);"></i> AI Detection Array</h3>
+                        </div>
+                        <div class="detection-tiles-sidebar">
+                            <!-- Human -->
+                            <div class="detection-tile" id="tile-human">
+                                <div class="tile-left">
+                                    <div class="tile-icon-wrap human-icon">
+                                        <i data-lucide="user"></i>
+                                    </div>
+                                    <div class="tile-info">
+                                        <div class="tile-label">Human</div>
+                                        <div class="tile-status" id="status-human">CLEAR</div>
+                                    </div>
+                                </div>
+                                <div class="tile-right">
+                                    <span class="tile-count" id="count-human">0</span>
+                                    <div class="tile-conf-bar">
+                                        <div class="tile-conf-fill human-fill" id="conf-human" style="width:0%"></div>
+                                    </div>
+                                    <span class="tile-conf-val" id="conf-val-human">0%</span>
+                                </div>
+                            </div>
+                            <!-- Fire -->
+                            <div class="detection-tile" id="tile-fire">
+                                <div class="tile-left">
+                                    <div class="tile-icon-wrap fire-icon">
+                                        <i data-lucide="flame"></i>
+                                    </div>
+                                    <div class="tile-info">
+                                        <div class="tile-label">Fire</div>
+                                        <div class="tile-status" id="status-fire">CLEAR</div>
+                                    </div>
+                                </div>
+                                <div class="tile-right">
+                                    <span class="tile-count" id="count-fire">0</span>
+                                    <div class="tile-conf-bar">
+                                        <div class="tile-conf-fill fire-fill" id="conf-fire" style="width:0%"></div>
+                                    </div>
+                                    <span class="tile-conf-val" id="conf-val-fire">0%</span>
+                                </div>
+                            </div>
+                            <!-- Smoke -->
+                            <div class="detection-tile" id="tile-smoke">
+                                <div class="tile-left">
+                                    <div class="tile-icon-wrap smoke-icon">
+                                        <i data-lucide="wind"></i>
+                                    </div>
+                                    <div class="tile-info">
+                                        <div class="tile-label">Smoke</div>
+                                        <div class="tile-status" id="status-smoke">CLEAR</div>
+                                    </div>
+                                </div>
+                                <div class="tile-right">
+                                    <span class="tile-count" id="count-smoke">0</span>
+                                    <div class="tile-conf-bar">
+                                        <div class="tile-conf-fill smoke-fill" id="conf-smoke" style="width:0%"></div>
+                                    </div>
+                                    <span class="tile-conf-val" id="conf-val-smoke">0%</span>
+                                </div>
+                            </div>
+                            <!-- Posture -->
+                            <div class="detection-tile" id="tile-pose">
+                                <div class="tile-left">
+                                    <div class="tile-icon-wrap pose-icon">
+                                        <i data-lucide="person-standing"></i>
+                                    </div>
+                                    <div class="tile-info">
+                                        <div class="tile-label">Posture</div>
+                                        <div class="tile-status" id="status-pose">--</div>
+                                    </div>
+                                </div>
+                                <div class="tile-right">
+                                    <span class="tile-count" id="count-pose">0</span>
+                                    <div class="tile-conf-bar">
+                                        <div class="tile-conf-fill pose-fill" id="conf-pose" style="width:0%"></div>
+                                    </div>
+                                    <span class="tile-conf-val" id="conf-val-pose">0%</span>
+                                </div>
+                            </div>
+                            <!-- Motion -->
+                            <div class="detection-tile" id="tile-motion">
+                                <div class="tile-left">
+                                    <div class="tile-icon-wrap motion-icon">
+                                        <i data-lucide="activity"></i>
+                                    </div>
+                                    <div class="tile-info">
+                                        <div class="tile-label">Motion</div>
+                                        <div class="tile-status" id="status-motion">NONE</div>
+                                    </div>
+                                </div>
+                                <div class="tile-right">
+                                    <span class="tile-count" id="count-motion">0</span>
+                                    <div class="tile-conf-bar">
+                                        <div class="tile-conf-fill motion-fill" id="conf-motion" style="width:0%"></div>
+                                    </div>
+                                    <span class="tile-conf-val" id="conf-val-motion">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Environmental Risk -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="thermometer" style="width:14px;height:14px;color:var(--status-warn);"></i> Environmental Risk</h3>
+                        </div>
+                        <div class="env-risk-grid">
+                            <div class="env-risk-card" id="env-fire-prox">
+                                <div class="env-risk-label">Fire Proximity</div>
+                                <div class="env-risk-value safe" id="env-fire-prox-val">SAFE</div>
+                            </div>
+                            <div class="env-risk-card" id="env-visibility">
+                                <div class="env-risk-label">Visibility</div>
+                                <div class="env-risk-value ok" id="env-visibility-val">HIGH</div>
+                            </div>
+                            <div class="env-risk-card" id="env-smoke-density">
+                                <div class="env-risk-label">Smoke Density</div>
+                                <div class="env-risk-value ok" id="env-smoke-density-val">CLEAR</div>
+                            </div>
+                            <div class="env-risk-card" id="env-toxic">
+                                <div class="env-risk-label">Toxic Warning</div>
+                                <div class="env-risk-value ok" id="env-toxic-val">NO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Survivor Intelligence Panel -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="scan-face" style="width:14px;height:14px;color:var(--accent);"></i> Survivor Intelligence</h3>
+                            <button class="section-action-btn" id="btn-clear-survivors">Clear</button>
+                        </div>
+                        <div class="survivor-panel" id="survivor-panel">
+                            <div class="survivor-empty" id="survivor-empty">
+                                <i data-lucide="scan" style="width:22px;height:22px;opacity:0.3;"></i>
+                                <span>Scanning for survivors&hellip;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rescue Priority List -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="list-ordered" style="width:14px;height:14px;color:var(--status-danger);"></i> Rescue Priority List</h3>
+                            <span class="rescue-count-badge" id="rescue-count-badge">0</span>
+                        </div>
+                        <div class="rescue-priority-list" id="rescue-priority-list">
+                            <div class="rescue-empty">
+                                <i data-lucide="shield-check" style="width:20px;height:20px;opacity:0.3;"></i>
+                                <span>All clear &mdash; no active targets</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incident Timeline -->
+                    <div class="cam-sidebar-section">
+                        <div class="section-title-row">
+                            <h3><i data-lucide="clock-4" style="width:14px;height:14px;color:var(--accent);"></i> Incident Timeline</h3>
+                            <button class="section-action-btn" id="btn-clear-timeline">Clear</button>
+                        </div>
+                        <div class="timeline-list" id="timeline-list">
+                            <div class="timeline-empty">
+                                <i data-lucide="clock" style="width:20px;height:20px;opacity:0.3;"></i>
+                                <span>No incidents logged</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end cam-sidebar -->
+
+            </div>
+            <!-- end camera-monitoring-container -->
+
+        </div>
+        <!-- end camera-shell -->
+
+        </main>
+        <!-- end page-content -->
+
+    </div>
+    <!-- end main-column -->
+
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="../shared/mqtt-client.js"></script>
+<script type="module" src="../shared/shared.js"></script>
+<script type="module" src="./camera.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+</body>
+</html>
+

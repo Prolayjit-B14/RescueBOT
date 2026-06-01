@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Disaster Rescue Monitoring System</title>
+    <meta name="description" content="Real-time disaster rescue monitoring, rover control, hazard detection and emergency response platform powered by ESP32, MQTT and AI Vision.">
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://rescuebot.vercel.app/">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');</script>
+    <link rel="stylesheet" href="./shared/shared.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ── LANDING PAGE OVERRIDES ─────────────────────────── */
+        html, body { overflow-x: hidden; overflow-y: auto; height: auto; }
+
+        /* ── NAV ─────────────────────────────────────────────── */
+        .landing-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            height: 52px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 36px;
+            background: var(--navbar-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 1px 0 var(--border-subtle);
+        }
+
+        .nav-brand {
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .nav-logo {
+            width: 32px; height: 32px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border-default);
+            flex-shrink: 0;
+        }
+
+        .nav-logo img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-brand-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .nav-links {
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        .nav-link-item {
+            padding: 6px 12px;
+            color: var(--text-muted);
+            font-size: 13px; font-weight: 500;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--t-fast);
+        }
+
+        .nav-link-item:hover { color: var(--accent); background: var(--accent-muted); border-radius: var(--radius-sm); }
+        .nav-link-item.active { color: var(--text-primary); }
+
+        .nav-cta {
+            padding: 7px 16px;
+            background: var(--accent-muted);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+            border-radius: var(--radius-sm);
+            font-size: 13px; font-weight: 500;
+            text-decoration: none;
+            transition: var(--t-fast);
+        }
+
+        .nav-cta:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .nav-theme-btn {
+            width: 32px; height: 32px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--t-fast);
+            margin-right: 8px;
+        }
+        .nav-theme-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--border-default);
+            color: var(--text-secondary);
+        }
+        .nav-theme-btn svg { width: 15px; height: 15px; }
+
+        /* ── HERO ─────────────────────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            padding: 96px 24px 72px;
+            position: relative; z-index: 1;
+        }
+
+        .hero-status-chip {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 5px 14px;
+            background: var(--status-ok-bg);
+            border: 1px solid var(--status-ok-bd);
+            border-radius: 99px;
+            font-size: 11px; font-weight: 600;
+            color: var(--status-ok);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .chip-dot {
+            width: 6px; height: 6px;
+            background: var(--status-ok);
+            border-radius: 50%;
+            animation: pulseOnline 2.5s ease-in-out infinite;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 4.5vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            margin-bottom: 18px;
+            color: var(--text-primary);
+            animation: fadeInUp 0.6s 0.1s both ease;
+        }
+
+        .hero-title .accent {
+            color: var(--accent);
+            display: inline-block;
+        }
+
+        .hero-tagline {
+            font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+            color: var(--text-secondary);
+            max-width: 540px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s 0.2s both ease;
+            font-weight: 400;
+        }
+
+        .hero-actions {
+            display: flex; align-items: center; gap: 12px;
+            flex-wrap: wrap; justify-content: center;
+            animation: fadeInUp 0.6s 0.3s both ease;
+            margin-bottom: 64px;
+        }
+
+        .cta-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 24px;
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 600;
+            text-decoration: none;
+            letter-spacing: 0.01em;
+            transition: var(--t-fast);
+            border: 1px solid var(--accent);
+        }
+
+        .cta-primary:hover {
+            background: var(--accent-dim);
+            border-color: var(--accent-dim);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cta-primary svg { width: 16px; height: 16px; }
+
+        .cta-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 24px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 500;
+            text-decoration: none;
+            transition: var(--t-fast);
+        }
+
+        .cta-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--border-strong);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .cta-secondary svg { width: 16px; height: 16px; }
+
+        /* ── STATS BAR ─────────────────────────────────────────── */
+        .stats-bar {
+            display: flex; gap: 0;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-default);
+            border-bottom: 1px solid var(--border-default);
+            position: relative; z-index: 1;
+            overflow-x: auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 18px 24px;
+            border-right: 1px solid var(--border-subtle);
+            min-width: 110px;
+            position: relative;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity var(--t-fast);
+        }
+        .stat-item:hover::before {
+            opacity: 0.8;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-num {
+            font-family: var(--font-mono);
+            font-size: 1.5rem; font-weight: 700;
+            color: var(--accent-bright);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-lbl {
+            font-size: 9px; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ── DIVIDER ──────────────────────────────────────────── */
+        .section-divider {
+            width: 40px; height: 2px;
+            background: var(--accent);
+            margin: 0 auto 16px;
+            border-radius: 2px;
+        }
+
+        /* ── FEATURES SECTION ──────────────────────────────────── */
+        .features-section {
+            padding: 80px 40px;
+            position: relative; z-index: 1;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .section-eyebrow {
+            text-align: center;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: clamp(1.4rem, 2.8vw, 2rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .features-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 3px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity var(--t-fast);
+        }
+
+        .feature-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 12px 32px -12px rgba(59, 130, 246, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .feature-card:hover::after {
+            opacity: 1;
+        }
+
+        .feature-icon-wrap {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            background: var(--accent-muted);
+            border: 1px solid var(--accent-border);
+            flex-shrink: 0;
+        }
+
+        .feature-icon-wrap svg {
+            width: 18px; height: 18px;
+            color: var(--accent);
+        }
+
+        .feature-card-title {
+            font-size: 14px; font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-card-desc {
+            font-size: 13px; line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* ── TECH STACK ──────────────────────────────────────────── */
+        .tech-section {
+            padding: 64px 40px;
+            text-align: center;
+            position: relative; z-index: 1;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .tech-chips {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            justify-content: center; max-width: 680px; margin: 24px auto 0;
+        }
+
+        .tech-chip {
+            padding: 5px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 99px;
+            font-family: var(--font-mono);
+            font-size: 11px; font-weight: 500;
+            color: var(--text-secondary);
+            transition: var(--t-fast);
+            letter-spacing: 0.01em;
+        }
+
+        .tech-chip:hover {
+            border-color: var(--border-default);
+            color: var(--text-primary);
+        }
+
+        /* ── FOOTER ──────────────────────────────────────────────── */
+        .landing-footer {
+            padding: 64px 40px 32px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-deep);
+            position: relative; z-index: 1;
+        }
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.2fr;
+            gap: 48px;
+        }
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .footer-brand {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-desc {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .footer-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .footer-link {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--t-fast);
+        }
+        .footer-link:hover {
+            color: var(--accent);
+        }
+        .footer-status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .footer-status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding-bottom: 6px;
+        }
+        .footer-status-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .footer-status-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-status-val {
+            font-weight: 600;
+        }
+        .status-beacon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--status-ok);
+            box-shadow: 0 0 8px var(--status-ok);
+        }
+        .status-beacon.active {
+            animation: pulseOnline 2s infinite alternate;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .footer-copyright {
+            line-height: 1.5;
+            text-align: left;
+        }
+        .footer-copyright strong {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .footer-git-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color var(--t-fast);
+        }
+        .footer-git-link:hover {
+            color: var(--accent);
+        }
+        .footer-git-link svg {
+            width: 14px;
+            height: 14px;
+        }
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            .footer-copyright {
+                text-align: center;
+            }
+        }
+
+        /* ── SUBTLE GRID BG ────────────────────────────────────── */
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0;
+            background-color: var(--bg-base);
+            background-image:
+                linear-gradient(var(--border-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+            background-size: 64px 64px;
+            pointer-events: none;
+        }
+
+        /* ── ANIMATIONS ──────────────────────────────────────────── */
+        @keyframes pulseOrb {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseOnline {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .landing-nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero { padding: 90px 20px 60px; }
+            .features-section { padding: 60px 20px; }
+            .features-grid { grid-template-columns: 1fr; gap: 12px; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-item { flex: 1 0 calc(50% - 1px); }
+            .tech-section { padding: 48px 20px; }
+        }
+
+        @media (max-width: 600px) {
+            .stat-item { flex: 1 0 100%; border-right: none; border-bottom: 1px solid var(--border-subtle); }
+            .stat-item:last-child { border-bottom: none; }
+            .hero-actions { flex-direction: column; width: 100%; }
+            .cta-primary, .cta-secondary { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <!-- NAVBAR -->
+    <nav class="landing-nav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <img src="./assets/logo.png" alt="RescueBOT">
+            </div>
+            <span class="nav-brand-name">RescueBOT</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link-item active">Home</a>
+            <a href="./dashboard/dashboard.html" class="nav-link-item">Overview</a>
+            <a href="./camera/camera.html" class="nav-link-item">Live Monitoring</a>
+            <a href="./map/map.html" class="nav-link-item">Incident Map</a>
+            <a href="./sensors/sensors.html" class="nav-link-item">Sensors</a>
+            <a href="./alerts/alerts.html" class="nav-link-item">Alerts</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button class="nav-theme-btn" id="landing-theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                <i data-lucide="moon"></i>
+            </button>
+            <a href="./dashboard/dashboard.html" class="nav-cta">Launch Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-status-chip">
+            <div class="chip-dot"></div>
+            <span>System Online &mdash; All Sensors Operational</span>
+        </div>
+
+        <h1 class="hero-title">
+            Disaster Rescue<br>
+            <span class="accent">Monitoring Platform</span>
+        </h1>
+
+        <p class="hero-tagline">
+            Real-time rover telemetry, hazard detection and emergency response coordination.
+            Powered by ESP32, MQTT, GPS and computer vision.
+        </p>
+
+        <div class="hero-actions">
+            <a href="./dashboard/dashboard.html" class="cta-primary">
+                <i data-lucide="layout-dashboard"></i>
+                Launch Dashboard
+            </a>
+            <a href="./camera/camera.html" class="cta-secondary">
+                <i data-lucide="video"></i>
+                Live Monitoring
+            </a>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-num uptime-val">00:00:00</div>
+            <div class="stat-lbl">Mission Uptime</div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-num counter" data-target="100" data-prefix="&lt;" data-suffix="ms">0</div>
+            <div class="stat-lbl">MQTT Latency</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num counter" data-target="30" data-suffix=" FPS">0</div>
+            <div class="stat-lbl">Camera Stream</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">24 / 7</div>
+            <div class="stat-lbl">Continuous Monitoring</div>
+        </div>
+    </div>
+
+    <!-- FEATURES SECTION -->
+    <section class="features-section">
+        <div class="section-eyebrow">Platform Capabilities</div>
+        <h2 class="features-title">End-to-End Disaster Intelligence</h2>
+        <p class="features-subtitle">
+            Unified monitoring stack from sensor telemetry to field response coordination.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="radio"></i>
+                </div>
+                <div class="feature-card-title">Live Telemetry</div>
+                <div class="feature-card-desc">Real-time sensor data streamed via MQTT from ESP32. Temperature, gas, vibration, humidity updated at 100ms intervals.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="map-pin"></i>
+                </div>
+                <div class="feature-card-title">GPS Tracking</div>
+                <div class="feature-card-desc">Live rover location with NEO-6M GPS module. Interactive Leaflet map with path trail, waypoints and hazard zone overlays.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="flame"></i>
+                </div>
+                <div class="feature-card-title">Hazard Detection</div>
+                <div class="feature-card-desc">MQ-2 gas sensor, flame detector and PIR motion sensor detect fire, toxic gases and human presence in real-time.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="scan"></i>
+                </div>
+                <div class="feature-card-title">Vision Analysis</div>
+                <div class="feature-card-desc">ESP32-CAM live streaming with AI object detection, human presence analysis, motion tracking and snapshot capture.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="bell-ring"></i>
+                </div>
+                <div class="feature-card-title">Emergency Alerts</div>
+                <div class="feature-card-desc">Priority-classified alert system with critical / high / medium / low tiers. SOS broadcast, audio alerts and timeline logging.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <i data-lucide="cpu"></i>
+                </div>
+                <div class="feature-card-title">Rover Control</div>
+                <div class="feature-card-desc">Emergency stop, autonomous mode toggle, camera control and return-to-base commands dispatched via MQTT.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="tech-section">
+        <div class="section-eyebrow">Technology Stack</div>
+        <h2 class="features-title" style="font-size:1.5rem;margin-bottom:0;">Built on Modern Web Technologies</h2>
+        <div class="tech-chips">
+            <span class="tech-chip">HTML5 / CSS3</span>
+            <span class="tech-chip">ES6+ JavaScript</span>
+            <span class="tech-chip">Vite Bundler</span>
+            <span class="tech-chip">Leaflet.js Mapping</span>
+            <span class="tech-chip">MQTT.js Protocol</span>
+            <span class="tech-chip">WebSockets Stream</span>
+            <span class="tech-chip">Lucide Icons</span>
+            <span class="tech-chip">TensorFlow.js AI</span>
+            <span class="tech-chip">COCO-SSD Object Detection</span>
+            <span class="tech-chip">EMQX Cloud Broker</span>
+            <span class="tech-chip">Vercel Deploy</span>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-grid">
+            <!-- Brand Column -->
+            <div class="footer-col">
+                <div class="footer-brand">
+                    <i data-lucide="shield-alert" style="color: var(--accent); width: 20px; height: 20px;"></i>
+                    RescueBOT Console
+                </div>
+                <p class="footer-desc">
+                    A real-time GIS mapping, computer vision AI hazard detection, and hardware telemetry command console for autonomous emergency search and rescue rovers.
+                </p>
+            </div>
+            <!-- Links Column -->
+            <div class="footer-col">
+                <div class="footer-title">Tactical Modules</div>
+                <div class="footer-links">
+                    <a href="./dashboard/dashboard.html" class="footer-link">Operations Dashboard</a>
+                    <a href="./camera/camera.html" class="footer-link">Live Vision Feed</a>
+                    <a href="./map/map.html" class="footer-link">Tactical GIS Map</a>
+                    <a href="./sensors/sensors.html" class="footer-link">Telemetry Array</a>
+                    <a href="./alerts/alerts.html" class="footer-link">Alert Center</a>
+                </div>
+            </div>
+            <!-- Status Column -->
+            <div class="footer-col">
+                <div class="footer-title">System Indicators</div>
+                <div class="footer-status-list">
+                    <div class="footer-status-item">
+                        <div class="footer-status-label">
+                            <div class="status-beacon active"></div>
+                            MQTT Gateway
+                        </div>
+                        <span class="footer-status-val" style="color:var(--status-ok);">ONLINE</span>
+                    </div>
+                    <div class="footer-status-item">
+                        <div class="footer-status-label">
+                            <div class="status-beacon active"></div>
+                            Vision Processor
+                        </div>
+                        <span class="footer-status-val" style="color:var(--status-ok);">ACTIVE</span>
+                    </div>
+                    <div class="footer-status-item">
+                        <div class="footer-status-label">
+                            <div class="status-beacon active"></div>
+                            System Uptime
+                        </div>
+                        <span class="footer-status-val uptime-val" style="color:var(--accent-bright);">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                <strong>RescueBOT Command</strong> &copy; 2026 Team Bot Things &middot; Platform Status: <span style="color:var(--status-ok);font-weight:600;">ACTIVE</span>
+            </div>
+            <a href="https://github.com/Prolayjit-B14/Diaster_Rover_Dashboard" class="footer-git-link" target="_blank" rel="noopener noreferrer">
+                <i data-lucide="github"></i>
+                GitHub Repository
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        if (window.lucide) lucide.createIcons();
+
+        // ── UPTIME COUNTER ──────────────────────────────────────
+        let secs = 0;
+        const uptimeEls = document.querySelectorAll('.uptime-val');
+        setInterval(() => {
+            secs++;
+            const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+            const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+            const s = String(secs % 60).padStart(2, '0');
+            const timeStr = `${h}:${m}:${s}`;
+            uptimeEls.forEach(el => el.textContent = timeStr);
+        }, 1000);
+
+        // ── SCROLL FADE-IN & STAGGERED CHIPS ───────────────────────
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.style.opacity = '1';
+                    e.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.feature-card, .tech-chip').forEach((el, i) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            const delay = el.classList.contains('tech-chip') ? (i % 10) * 0.05 : i * 0.06;
+            el.style.transition = `opacity 0.4s ${delay}s ease, transform 0.4s ${delay}s ease, border-color 0.2s, box-shadow 0.3s, color 0.2s`;
+            observer.observe(el);
+        });
+
+        // ── COUNTER ANIMATION ────────────────────────────────────
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting && !e.target.classList.contains('counted')) {
+                    e.target.classList.add('counted');
+                    const target = +e.target.getAttribute('data-target');
+                    const prefix = e.target.getAttribute('data-prefix') || '';
+                    const suffix = e.target.getAttribute('data-suffix') || '';
+                    const duration = 1500;
+                    const startTime = performance.now();
+                    
+                    const updateCounter = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                        const currentVal = Math.floor(easeOutQuart * target);
+                        
+                        e.target.textContent = prefix + currentVal + suffix;
+                        if (progress < 1) requestAnimationFrame(updateCounter);
+                        else e.target.textContent = prefix + target + suffix;
+                    };
+                    requestAnimationFrame(updateCounter);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        document.querySelectorAll('.counter').forEach(c => counterObserver.observe(c));
+
+    </script>
+    <script type="module" src="./shared/shared.js"></script>
+</body>
+</html>
+

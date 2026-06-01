@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Alert Center</title>
+    <meta name="description" content="Priority-classified emergency alert monitoring and incident response coordination.">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');</script>
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="./alerts.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-mark">
+                <img src="../assets/logo.png" alt="RescueBOT">
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">RescueBOT</span>
+                <span class="logo-ver">Emergency Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Operations</div>
+            <a href="../dashboard/dashboard.html" class="nav-item" data-tooltip="Overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="../camera/camera.html" class="nav-item" data-tooltip="Live Monitoring">
+                <i data-lucide="video"></i>
+                <span class="nav-label">Live Monitoring</span>
+            </a>
+            <a href="../map/map.html" class="nav-item" data-tooltip="Incident Map">
+                <i data-lucide="map-pin"></i>
+                <span class="nav-label">Incident Map</span>
+            </a>
+            <a href="../sensors/sensors.html" class="nav-item" data-tooltip="Field Sensors">
+                <i data-lucide="activity"></i>
+                <span class="nav-label">Field Sensors</span>
+            </a>
+            <a href="./alerts.html" class="nav-item active" data-tooltip="Alert Center">
+                <i data-lucide="bell-ring"></i>
+                <span class="nav-label">Alert Center</span>
+                <span class="nav-badge" id="sidebar-alert-count">0</span>
+            </a>
+
+            <div class="nav-section-label" style="margin-top:8px;">System</div>
+            <a href="../" class="nav-item" data-tooltip="Home">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ══ MAIN COLUMN ══════════════════════════════════════════ -->
+    <div class="main-column">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="nav-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="nav-title-group">
+                    <span class="nav-breadcrumb">RescueBOT / Operations</span>
+                    <h1 class="nav-page-title">Alert Center</h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content page-enter">
+
+            <!-- ALERTS LAYOUT -->
+            <div class="alerts-layout">
+
+                <!-- LEFT: MAIN ALERTS PANEL -->
+                <div class="alerts-main">
+
+                    <!-- Stats Summary Bar -->
+                    <div class="bento-card alert-stats-bar">
+                        <div class="alert-stat-item">
+                            <div class="alert-stat-val" id="stat-total" style="color:var(--text-primary);">0</div>
+                            <div class="alert-stat-key">Total</div>
+                        </div>
+                        <div class="alert-stat-sep"></div>
+                        <div class="alert-stat-item">
+                            <div class="alert-stat-val" id="stat-critical" style="color:var(--status-danger);">0</div>
+                            <div class="alert-stat-key">Critical</div>
+                        </div>
+                        <div class="alert-stat-sep"></div>
+                        <div class="alert-stat-item">
+                            <div class="alert-stat-val" id="stat-resolved" style="color:var(--status-ok);">0</div>
+                            <div class="alert-stat-key">Resolved</div>
+                        </div>
+                        <div class="alert-stat-sep"></div>
+                        <div class="alert-stat-item" style="flex:1;">
+                            <div class="alert-stat-val" id="stat-uptime" style="color:var(--accent);font-size:var(--text-base);">00:00:00</div>
+                            <div class="alert-stat-key">System Uptime</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:var(--space-2);">
+                            <div class="status-dot"></div>
+                            <span style="font-size:var(--text-xs);color:var(--text-muted);font-family:var(--font-mono);">ALL SYSTEMS NOMINAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="alert-filter-row">
+                        <button class="filter-tab active" id="tab-all" data-filter="all">All Alerts</button>
+                        <button class="filter-tab" id="tab-critical" data-filter="critical">
+                            Critical
+                            <span class="count" id="cnt-critical">0</span>
+                        </button>
+                        <button class="filter-tab" id="tab-high" data-filter="high">
+                            High
+                            <span class="count" id="cnt-high">0</span>
+                        </button>
+                        <button class="filter-tab" id="tab-medium" data-filter="medium">
+                            Medium
+                            <span class="count" id="cnt-medium">0</span>
+                        </button>
+                        <button class="filter-tab" id="tab-low" data-filter="low">
+                            Low
+                            <span class="count" id="cnt-low">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Alert List (JS-populated) -->
+                    <div class="alert-list" id="alert-list"></div>
+
+                    <!-- Empty State -->
+                    <div class="empty-alerts" id="empty-alerts" style="display:none;">
+                        <span class="empty-icon">
+                            <i data-lucide="check-circle-2" style="width:36px;height:36px;color:var(--status-ok);"></i>
+                        </span>
+                        <h3>No Active Alerts</h3>
+                        <p>All systems nominal — continuous monitoring active</p>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: SIDEBAR PANELS -->
+                <div class="alerts-sidebar">
+
+                    <!-- SOS Panel -->
+                    <div class="bento-card sos-panel">
+                        <h3 class="section-title-sm">Emergency SOS Broadcast</h3>
+                        <button class="sos-btn" id="sos-btn">SOS</button>
+                        <p style="color:var(--text-muted);font-size:var(--text-sm);line-height:1.6;text-align:center;">
+                            Triggers immediate emergency broadcast via MQTT to all connected response systems.
+                        </p>
+                    </div>
+
+                    <!-- Sound Settings -->
+                    <div class="bento-card settings-panel">
+                        <div class="sound-settings-header">Audio Notifications</div>
+                        <button class="sound-toggle" id="sound-toggle-card">
+                            <span class="sound-toggle-label">
+                                <i data-lucide="volume-2"></i>
+                                Audio Alerts
+                            </span>
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </button>
+                        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-3);line-height:1.7;">
+                            Enable audio notifications for critical and high-priority incidents.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="../shared/mqtt-client.js"></script>
+<script type="module" src="../shared/shared.js"></script>
+<script type="module" src="./alerts.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
+

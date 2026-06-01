@@ -1,0 +1,518 @@
+/* ============================================================
+   TACTICAL GIS MAP PAGE — Premium Clean HUD Redesign
+   ============================================================ */
+
+/* ── EMERGENCY ALERT RED FLASH OVERLAY ──────────────────────────────── */
+.emergency-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: inset 0 0 100px rgba(239, 68, 68, 0);
+    transition: opacity 0.5s ease;
+}
+.emergency-overlay.active {
+    opacity: 1;
+    animation: pulseRedFlash 1.8s infinite;
+}
+@keyframes pulseRedFlash {
+    0%, 100% { box-shadow: inset 0 0 80px rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.03); }
+    50% { box-shadow: inset 0 0 140px rgba(239, 68, 68, 0.7); background: rgba(239, 68, 68, 0.12); }
+}
+
+/* Flashing warning banner */
+.geofence-alert-banner {
+    position: absolute;
+    top: 66px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(239, 68, 68, 0.95);
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 8px 24px;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+    z-index: 99998;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+}
+.geofence-alert-banner.active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.geofence-alert-banner i {
+    animation: pulseIcon 1s infinite alternate;
+}
+@keyframes pulseIcon {
+    from { transform: scale(1); }
+    to { transform: scale(1.2); }
+}
+
+/* ── MAP LAYOUT STRUCTURE ───────────────────────────────────────────── */
+.map-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: var(--space-6);
+    background: var(--bg-base);
+}
+#map-canvas {
+    position: absolute;
+    top: var(--space-6);
+    bottom: var(--space-6);
+    left: var(--space-6);
+    right: var(--space-6);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    z-index: 1;
+    overflow: hidden;
+    transition: border-color var(--t-med), box-shadow var(--t-med);
+    box-shadow: var(--shadow-sm);
+}
+
+#map-canvas:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+}
+
+/* RGB variables mapped to IDs for alpha-blended glows */
+#btn-follow { --btn-rgb: 0, 212, 255; }
+#btn-safe { --btn-rgb: 0, 255, 136; }
+#btn-danger { --btn-rgb: 255, 45, 85; }
+#btn-base-station { --btn-rgb: 0, 212, 255; }
+#btn-survivor { --btn-rgb: 255, 0, 127; }
+#btn-obstacle { --btn-rgb: 255, 184, 0; }
+#btn-supplies { --btn-rgb: 160, 102, 255; }
+#btn-fire { --btn-rgb: 255, 87, 34; }
+#btn-gas { --btn-rgb: 224, 64, 251; }
+#btn-water { --btn-rgb: 33, 150, 243; }
+#btn-clear-path { --btn-rgb: 139, 164, 192; }
+
+#btn-zoom-in { --btn-rgb: 0, 255, 136; }
+#btn-zoom-out { --btn-rgb: 255, 45, 85; }
+#btn-recenter { --btn-rgb: 255, 184, 0; }
+#btn-layers { --btn-rgb: 160, 102, 255; }
+
+/* ── FLOATING TACTICAL TOOLBAR (INDIVIDUAL FLOATING DOCK) ─────────────── */
+.map-floating-tools {
+    position: absolute;
+    top: calc(var(--space-4) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    pointer-events: none;
+    z-index: 1000;
+}
+.map-floating-tools > * {
+    pointer-events: auto;
+}
+[data-theme="light"] .map-floating-tools {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.map-tool-divider {
+    display: none;
+}
+
+/* ── TOOL STRIP BUTTONS ────────────────────────────────────────────── */
+.map-tool-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 50% !important; /* Circular premium buttons */
+    color: var(--btn-color, var(--text-secondary));
+    cursor: pointer;
+    transition: all var(--t-fast) cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    flex-shrink: 0;
+    position: relative;
+}
+[data-theme="light"] .map-tool-btn {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+.map-tool-btn svg,
+.map-tool-btn i {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform var(--t-fast) ease;
+}
+.map-tool-btn:hover {
+    color: var(--btn-color) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-color: rgba(var(--btn-rgb, 59, 130, 246), 0.5) !important;
+    box-shadow: 0 0 15px rgba(var(--btn-rgb, 59, 130, 246), 0.35), 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    transform: translateY(-2px) scale(1.08);
+}
+[data-theme="light"] .map-tool-btn:hover {
+    background: #ffffff !important;
+    border-color: rgba(var(--btn-rgb, 59, 130, 246), 0.5) !important;
+    box-shadow: 0 0 12px rgba(var(--btn-rgb, 59, 130, 246), 0.2), 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+.map-tool-btn:hover svg,
+.map-tool-btn:hover i {
+    transform: scale(1.12);
+}
+.map-tool-btn.active {
+    color: var(--btn-color) !important;
+    background: rgba(var(--btn-rgb, 59, 130, 246), 0.22) !important;
+    border-color: var(--btn-color) !important;
+    box-shadow: 0 0 20px rgba(var(--btn-rgb, 59, 130, 246), 0.45), 
+                inset 0 0 8px rgba(var(--btn-rgb, 59, 130, 246), 0.2),
+                0 4px 16px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(-2px) scale(1.08);
+}
+
+/* ── CUSTOM TACTICAL TOOLTIPS ───────────────────────────────────────── */
+.map-tool-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: rgba(11, 15, 25, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+.map-tool-btn::before {
+    content: '';
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--border-default) transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 9999;
+}
+.map-tool-btn:hover::after,
+.map-tool-btn:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* ── HUD BOTTOM COORDINATES PANELS ───────────────────────────────────── */
+.map-hud-bottom {
+    position: absolute;
+    bottom: calc(var(--space-4) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-3);
+    pointer-events: auto;
+}
+.map-hud-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 90px;
+    transition: border-color var(--t-med), box-shadow var(--t-med), transform var(--t-med);
+    box-shadow: var(--shadow-sm);
+}
+.map-hud-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1.5px);
+}
+.hud-card-val {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    white-space: nowrap;
+}
+.hud-card-lbl {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ── RIGHT ZOOM & RECENTER CONTROLS (INDIVIDUAL FLOATING PILLS) ───────── */
+.map-tools-right {
+    position: absolute;
+    right: calc(var(--space-4) + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    pointer-events: none;
+    z-index: 1000;
+}
+.map-tools-right > * {
+    pointer-events: auto;
+}
+[data-theme="light"] .map-tools-right {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.map-zoom-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 50% !important; /* Circular buttons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--btn-color, var(--text-secondary));
+    transition: all var(--t-fast) cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    position: relative;
+}
+[data-theme="light"] .map-zoom-btn {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+.map-zoom-btn svg,
+.map-zoom-btn i {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--t-fast) ease;
+}
+.map-zoom-btn:hover {
+    color: var(--btn-color) !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-color: rgba(var(--btn-rgb, 59, 130, 246), 0.5) !important;
+    box-shadow: 0 0 15px rgba(var(--btn-rgb, 59, 130, 246), 0.35), 0 4px 16px rgba(0, 0, 0, 0.45) !important;
+    transform: scale(1.08);
+}
+[data-theme="light"] .map-zoom-btn:hover {
+    background: #ffffff !important;
+    border-color: rgba(var(--btn-rgb, 59, 130, 246), 0.5) !important;
+    box-shadow: 0 0 12px rgba(var(--btn-rgb, 59, 130, 246), 0.2), 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+.map-zoom-btn:hover svg,
+.map-zoom-btn:hover i {
+    transform: scale(1.12);
+}
+.map-zoom-btn.active {
+    color: var(--btn-color) !important;
+    background: rgba(var(--btn-rgb, 59, 130, 246), 0.22) !important;
+    border-color: var(--btn-color) !important;
+    box-shadow: 0 0 20px rgba(var(--btn-rgb, 59, 130, 246), 0.45) !important;
+    transform: scale(1.08);
+}
+
+.map-zoom-divider {
+    display: none;
+}
+
+/* Left-opening custom tooltips for right-aligned dock */
+.map-zoom-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    background: rgba(11, 15, 25, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+.map-zoom-btn::before {
+    content: '';
+    position: absolute;
+    right: calc(100% + 2px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--border-default);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 9999;
+}
+.map-zoom-btn:hover::after,
+.map-zoom-btn:hover::before {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+
+/* ── LEAFLET CUSTOM POPUPS OVERRIDES ────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+    background: #101624 !important;
+    color: #EFF2F7 !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 2px !important;
+}
+[data-theme="light"] .leaflet-popup-content-wrapper {
+    background: #ffffff !important;
+    color: #0F172A !important;
+    border: 1px solid var(--border-default) !important;
+}
+.leaflet-popup-tip {
+    background: #101624 !important;
+}
+[data-theme="light"] .leaflet-popup-tip {
+    background: #ffffff !important;
+}
+.leaflet-popup-close-button {
+    color: var(--text-muted) !important;
+    font-size: 14px !important;
+    padding: 4px 8px !important;
+}
+.leaflet-popup-close-button:hover {
+    color: var(--accent) !important;
+}
+
+/* ── COMPASS NEEDLE GLOW FOR ROVER ──────────────────────────────────── */
+@keyframes pulseCompass {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3), 0 0 4px rgba(59, 130, 246, 0.6); }
+    50%       { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0), 0 0 10px rgba(59, 130, 246, 0.7); }
+}
+.rover-pulse-ring {
+    width: 18px; height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.7);
+    animation: pulseCompass 2s ease-in-out infinite;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    position: relative;
+}
+.rover-pulse-dot {
+    width: 5px; height: 5px;
+    background: #ffffff;
+    border-radius: 50%;
+}
+
+/* Radar pulse wave scan effect */
+.rover-pulse-ring::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    border-radius: 50%;
+    animation: radarRingScan 2s linear infinite;
+    pointer-events: none;
+}
+@keyframes radarRingScan {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    100% {
+        transform: scale(2.4);
+        opacity: 0;
+        box-shadow: 0 0 8px 4px rgba(59, 130, 246, 0);
+    }
+}
+
+.rover-compass-heading {
+    position: absolute;
+    top: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 8px solid var(--accent);
+    z-index: 3;
+    transition: transform 0.15s ease;
+}
+
+/* Mobile adjustment for HUD overlays */
+@media (max-width: 900px) {
+    .map-floating-tools {
+        left: 16px !important;
+        right: 16px !important;
+        transform: none !important;
+        max-width: calc(100vw - 32px) !important;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        padding: 4px;
+    }
+    .map-hud-bottom {
+        left: 16px !important;
+        right: 16px !important;
+        transform: none !important;
+        max-width: calc(100vw - 32px) !important;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        padding: 4px;
+        bottom: calc(var(--space-4) + 12px) !important;
+    }
+    .map-hud-card {
+        flex-shrink: 0;
+    }
+}
+

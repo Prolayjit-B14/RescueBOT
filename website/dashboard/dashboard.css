@@ -1,0 +1,325 @@
+/* ============================================================
+   DASHBOARD PAGE — Enhanced Bento Grid Redesign
+   ============================================================ */
+
+/* ── BENTO GRID ──────────────────────────────────────────── */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(130px, auto);
+    gap: var(--space-6);
+    padding: var(--space-6);
+    width: 100%;
+}
+
+/* ── BENTO CARD BASE ─────────────────────────────────────── */
+.bento-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.bento-card:hover {
+    transform: translateY(-1.5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+}
+
+/* ── BENTO HEADER ────────────────────────────────────────── */
+.bento-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 10px;
+}
+
+.bento-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+}
+
+.bento-header i, .bento-header svg {
+    width: 18px; height: 18px;
+}
+
+.bento-header-overlay {
+    position: absolute;
+    top: var(--space-4); left: var(--space-4); right: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, transparent 100%);
+    pointer-events: none;
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+}
+
+.bento-action-icon {
+    pointer-events: auto;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bento-action-icon:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+}
+.bento-action-icon i { width: 14px; height: 14px; }
+
+/* ── BENTO CONTENT ───────────────────────────────────────── */
+.bento-content {
+    padding: 0 24px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-body-full {
+    flex: 1;
+    width: 100%; height: 100%;
+    background: #000;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    overflow: hidden;
+}
+
+/* Centered status content */
+.centered-content {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.status-orb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--status-ok);
+    border: 2px solid var(--border-default);
+    margin-bottom: 8px;
+}
+
+.centered-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.centered-content .subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.badges {
+    display: flex; gap: 8px; margin-top: 4px;
+}
+
+/* Row content (Battery) */
+.row-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.batt-ring-container {
+    position: relative;
+    width: 60px; height: 60px;
+}
+
+.batt-ring-container svg { transform: rotate(-90deg); }
+.batt-bg { stroke: rgba(255,255,255,0.05); }
+.batt-fill { stroke: var(--status-ok); stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+
+.batt-val {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.batt-stats {
+    display: flex; flex-direction: column; gap: 8px;
+}
+.stat-line {
+    display: flex; justify-content: space-between; gap: 16px;
+    font-size: 12px;
+}
+.stat-line .lbl { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+.stat-line .val { color: var(--text-primary); font-family: var(--font-mono); font-weight: 600; }
+
+/* List content (Environment / Telemetry) */
+.list-content {
+    justify-content: space-evenly;
+}
+
+.env-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.env-row:last-child { border-bottom: none; }
+
+.env-row i { width: 14px; height: 14px; }
+.env-lbl { flex: 1; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.env-val { font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+.env-val small { font-size: 10px; color: var(--text-muted); font-weight: normal; margin-left: 2px; }
+
+/* Actions Grid */
+.actions-grid {
+    display: flex; gap: 12px;
+    align-items: center;
+}
+
+.bento-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--t-fast);
+}
+
+.bento-btn.estop {
+    background: var(--status-danger-bg);
+    color: var(--status-danger);
+    border-color: var(--status-danger-bd);
+}
+.bento-btn.estop:hover { background: rgba(239, 68, 68, 0.15); }
+
+.bento-btn.auto {
+    background: var(--accent-muted);
+    color: var(--accent);
+    border-color: var(--accent-border);
+}
+.bento-btn.auto:hover { background: rgba(59, 130, 246, 0.18); }
+
+.bento-btn.home {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-default);
+}
+.bento-btn.home:hover { background: var(--bg-card-hover); border-color: var(--border-strong); }
+
+/* Alerts List */
+.alerts-list {
+    display: flex; gap: 12px; align-items: center;
+}
+
+.alert-pill {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.alert-pill i { width: 14px; height: 14px; }
+.alert-pill.ok i { color: var(--status-ok); }
+.alert-pill.critical { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.1); color: var(--status-danger); }
+.alert-pill.critical i { color: var(--status-danger); }
+
+.view-all { font-size: 11px; color: var(--accent); text-decoration: none; }
+.view-all:hover { text-decoration: underline; }
+
+/* ── SPECIFIC GRID PLACEMENTS ────────────────────────────── */
+.bento-cam { grid-column: span 6; grid-row: span 2; padding: var(--space-4); min-height: 280px; }
+.bento-map { grid-column: span 6; grid-row: span 2; padding: var(--space-4); min-height: 280px; }
+.bento-status { grid-column: span 3; }
+.bento-power { grid-column: span 3; }
+.bento-env { grid-column: span 3; }
+.bento-telemetry { grid-column: span 3; }
+.bento-imu { grid-column: span 3; }
+.bento-vib { grid-column: span 3; }
+.bento-kinematics { grid-column: span 6; }
+.bento-actions { grid-column: span 6; }
+.bento-alerts { grid-column: span 6; }
+
+/* Interactive Widgets styling */
+.bubble-level-wrap {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bubble-crosshair-v, .bubble-crosshair-h {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.07);
+}
+.bubble-crosshair-v { top: 0; bottom: 0; width: 1px; left: 50%; }
+.bubble-crosshair-h { left: 0; right: 0; height: 1px; top: 50%; }
+.bubble-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: absolute;
+    top: calc(50% - 4px);
+    left: calc(50% - 4px);
+    transition: transform 0.25s ease;
+}
+.seismic-wave-wrap {
+    width: 100%;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.seismic-bar {
+    width: 6%;
+    background: var(--status-ok);
+    min-height: 2px;
+    transition: height 0.15s ease;
+}
+
+/* Responsive break-points */
+@media (max-width: 1200px) {
+    .bento-cam, .bento-map { grid-column: span 12; min-height: 300px; }
+    .bento-status, .bento-power, .bento-env, .bento-telemetry, .bento-imu, .bento-vib { grid-column: span 6; }
+    .bento-actions, .bento-alerts, .bento-kinematics { grid-column: span 12; }
+}
+
+@media (max-width: 768px) {
+    .bento-status, .bento-power, .bento-env, .bento-telemetry, .bento-imu, .bento-vib { grid-column: span 12; }
+    .bento-actions, .bento-alerts, .bento-kinematics { grid-column: span 12; }
+    .actions-grid { flex-direction: column; }
+    .alerts-list { flex-direction: column; }
+}
+

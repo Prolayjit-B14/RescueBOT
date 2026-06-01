@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBOT | Tactical GIS Map</title>
+    <meta name="description" content="Live Leaflet-based GPS tracking and hazard geofencing dashboard for RescueBOT disaster command center.">
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    
+    <!-- Theme setup (runs immediately to prevent flash) -->
+    <script>
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('rescuebot-theme') || 'dark');
+    </script>
+    
+    <!-- Stylesheets: Fallback links + Embedded self-contained styling -->
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="./map.css">
+    
+    <!-- Leaflet JS & CSS CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+</head>
+<body>
+
+
+
+<div class="app-shell">
+
+    <!-- ══ SIDEBAR (LEFT) ══════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-mark">
+                <img src="../assets/logo.png" alt="RescueBOT" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">RescueBOT</span>
+                <span class="logo-ver">Emergency Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Operations</div>
+            <a href="../dashboard/dashboard.html" class="nav-item" data-tooltip="Overview">
+                <i data-lucide="layout-dashboard"></i>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="../camera/camera.html" class="nav-item" data-tooltip="Live Monitoring">
+                <i data-lucide="video"></i>
+                <span class="nav-label">Live Monitoring</span>
+            </a>
+            <a href="./map.html" class="nav-item active" data-tooltip="Incident Map">
+                <i data-lucide="map-pin"></i>
+                <span class="nav-label">Incident Map</span>
+            </a>
+            <a href="../sensors/sensors.html" class="nav-item" data-tooltip="Field Sensors">
+                <i data-lucide="activity"></i>
+                <span class="nav-label">Field Sensors</span>
+            </a>
+            <a href="../alerts/alerts.html" class="nav-item" data-tooltip="Alert Center">
+                <i data-lucide="bell-ring"></i>
+                <span class="nav-label">Alert Center</span>
+                <span class="nav-badge" id="sidebar-alert-count">0</span>
+            </a>
+            <div class="nav-section-label" style="margin-top:8px;">System</div>
+            <a href="../" class="nav-item" data-tooltip="Home">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ══ MAIN DASHBOARD COLUMN ══════════════════════════════════════════ -->
+    <div class="main-column">
+
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="nav-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="nav-title-group">
+                    <span class="nav-breadcrumb">RescueBOT / Operations</span>
+                    <h1 class="nav-page-title">Incident Map</h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="status-group">
+                    <div class="status-item" style="padding: 0 var(--space-2); height: 28px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <div class="status-dot offline" id="gps-dot" style="margin: 0;"></div>
+                        <i data-lucide="satellite" id="gps-icon" style="width:12px;height:12px;color:#EF4444;margin: 0;"></i>
+                        <span id="gps-status" style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">GPS OFFLINE</span>
+                    </div>
+                </div>
+                <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-content page-enter" style="padding: 0;">
+
+            <!-- MAP CANVAS CONTAINER -->
+            <div class="map-shell">
+
+            <!-- ── INTERACTIVE MAP CANVAS (LEAFLET) ─────────────────────────── -->
+            <div id="map-canvas"></div>
+
+            <!-- ── FLOATING TACTICAL TOOLBAR (TOP MIDDLE) ──────────────── -->
+            <div class="map-hud-overlay map-floating-tools">
+                <button class="map-tool-btn active" id="btn-follow" style="--btn-color: #00D4FF;" data-tooltip="Follow Rover">
+                    <i data-lucide="crosshair"></i>
+                </button>
+                <div class="map-tool-divider"></div>
+                <button class="map-tool-btn" id="btn-safe" style="--btn-color: #00FF88;" data-tooltip="Safe Zone">
+                    <i data-lucide="shield"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-danger" style="--btn-color: #FF2D55;" data-tooltip="Danger Zone">
+                    <i data-lucide="alert-triangle"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-base-station" style="--btn-color: #00D4FF;" data-tooltip="Base Station">
+                    <i data-lucide="radio"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-survivor" style="--btn-color: #FF007F;" data-tooltip="Survivor (SOS)">
+                    <i data-lucide="heart"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-obstacle" style="--btn-color: #FFB800;" data-tooltip="Obstacle">
+                    <i data-lucide="construction"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-supplies" style="--btn-color: #A066FF;" data-tooltip="Supplies">
+                    <i data-lucide="package"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-fire" style="--btn-color: #FF5722;" data-tooltip="Fire Source">
+                    <i data-lucide="flame"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-gas" style="--btn-color: #E040FB;" data-tooltip="Gas Hazard">
+                    <i data-lucide="skull"></i>
+                </button>
+                <button class="map-tool-btn" id="btn-water" style="--btn-color: #2196F3;" data-tooltip="Water Hazard">
+                    <i data-lucide="droplet"></i>
+                </button>
+                <div class="map-tool-divider"></div>
+                <button class="map-tool-btn" id="btn-clear-path" style="--btn-color: #8BA4C0;" data-tooltip="Clear Trail">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+
+            <!-- ── HUD BOTTOM STATS CARDS (COORDINATES READOUTS) ─────────────── -->
+            <div class="map-hud-overlay map-hud-bottom">
+                <div class="map-hud-card">
+                    <div class="hud-card-val" id="lat-hud">--</div>
+                    <div class="hud-card-lbl">Rover Lat</div>
+                </div>
+                <div class="map-hud-card">
+                    <div class="hud-card-val" id="lng-hud">--</div>
+                    <div class="hud-card-lbl">Rover Lng</div>
+                </div>
+                <div class="map-hud-card">
+                    <div class="hud-card-val" id="target-lat-hud">--</div>
+                    <div class="hud-card-lbl">Target Lat</div>
+                </div>
+                <div class="map-hud-card">
+                    <div class="hud-card-val" id="target-lng-hud">--</div>
+                    <div class="hud-card-lbl">Target Lng</div>
+                </div>
+                <div class="map-hud-card">
+                    <div class="hud-card-val" id="mission-timer-hud">00:00:00</div>
+                    <div class="hud-card-lbl">Mission Time</div>
+                </div>
+            </div>
+
+            <!-- ── FLOATING ZOOM & QUICK RECENTER MAP CONTROL PILLS ─────────── -->
+            <div class="map-tools-right">
+                <button class="map-zoom-btn" id="btn-zoom-in" style="--btn-color: #00FF88;" data-tooltip="Zoom In">
+                    <i data-lucide="plus"></i>
+                </button>
+                <button class="map-zoom-btn" id="btn-zoom-out" style="--btn-color: #FF2D55;" data-tooltip="Zoom Out">
+                    <i data-lucide="minus"></i>
+                </button>
+                <div class="map-zoom-divider"></div>
+                <button class="map-zoom-btn" id="btn-recenter" style="--btn-color: #FFB800;" data-tooltip="Recenter">
+                    <i data-lucide="crosshair"></i>
+                </button>
+                <button class="map-zoom-btn" id="btn-layers" style="--btn-color: #A066FF;" data-tooltip="Layers Toggle">
+                    <i data-lucide="layers"></i>
+                </button>
+            </div>
+
+        </div>
+        <!-- end map-shell -->
+
+        </main>
+        <!-- end page-content -->
+
+    </div>
+    <!-- end main-column -->
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<!-- External scripts logic fallback -->
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script type="module" src="../shared/mqtt-client.js"></script>
+<script type="module" src="../shared/shared.js"></script>
+
+<script>
+    // Core state management
+    let map = null;
+    let roverMarker = null;
+    let isFollowing = true;
+    let activeTool = null;
+    
+    let currentPos = null; // [lat, lng]
+    let roverHeading = 0;
+    
+    // Breadcrumbs path
+    let breadcrumbCoords = []; // [[lat, lng], [lat, lng], ...]
+    let pathLine = null;
+    let pathGlow = null;
+    
+
+    
+    // Custom landmarks array
+    let landmarks = [];
+    
+    // Mission Timer variables
+    let missionSecs = 0;
+    let missionInterval = null;
+
+    // Tile Layers
+    let osmLayer = null;
+    let esriLayer = null;
+    let activeLayerName = 'streets'; // 'streets' or 'satellite'
+    
+
+    // ── INITIALIZATION ───────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) window.lucide.createIcons();
+        startMissionTimer();
+        setupSidebarThemeEvents();
+        initializeMap(); // Initialize Leaflet map directly, no keys/wizards needed
+    });
+
+    // ── MAP TILE LAYER (always light style for best map readability) ─────────
+    function updateMapLayerForTheme() {
+        if (!map) return;
+        const showSatellite = activeLayerName === 'satellite';
+        if (osmLayer && map.hasLayer(osmLayer)) map.removeLayer(osmLayer);
+
+        // Always light tiles — clearest labels and road markings
+        osmLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
+
+        if (!showSatellite) osmLayer.addTo(map);
+    }
+
+    function initializeMap() {
+        try {
+            map = L.map('map-canvas', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([22.5726, 88.3639], 14); // Center on default preview location (Kolkata, India) while acquiring GPS lock
+            
+            // Try to center the map on the user's real browser/device location as fallback
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        if (map && !currentPos) {
+                            map.setView([userLat, userLng], 15);
+                            window.RESCUEBOT_UI?.toast('Map centered on browser location', 'success');
+                        }
+                    },
+                    (error) => {
+                        console.warn('Browser geolocation failed:', error.message);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            }
+            
+            // Free Esri satellite imagery tiles (requires no API keys)
+            esriLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19
+            });
+            
+            // Add light map tile layer (always light regardless of UI theme)
+            updateMapLayerForTheme();
+
+            // No theme listener needed — map tiles are always light
+            
+            // Sync style switcher status on layer switch via native control (if added)
+            map.on('baselayerchange', (e) => {
+                if (e.layer === esriLayer) {
+                    activeLayerName = 'satellite';
+                    document.getElementById('btn-layers')?.classList.add('active');
+                } else {
+                    activeLayerName = 'streets';
+                    document.getElementById('btn-layers')?.classList.remove('active');
+                }
+            });
+
+            // Map Click listener for target display & landmarks placing
+            map.on('click', (e) => {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                document.getElementById('target-lat-hud').textContent = lat.toFixed(5);
+                document.getElementById('target-lng-hud').textContent = lng.toFixed(5);
+                
+                if (activeTool) {
+                    addLandmark(lat, lng, activeTool);
+                }
+            });
+            
+            // Turn off follow mode if user starts dragging map
+            map.on('dragstart', () => {
+                if (isFollowing) {
+                    isFollowing = false;
+                    document.getElementById('btn-follow').classList.remove('active');
+                    window.RESCUEBOT_UI?.toast('Camera follow deactivated', 'info');
+                }
+            });
+
+            setupInteractiveHUDControls();
+            setupMqttConnector();
+            
+        } catch (err) {
+            console.error('Leaflet initialization failed:', err);
+            alert('Error loading Leaflet. Check console logs.');
+        }
+    }
+
+
+    // ── CORE FUNCTION: updateRoverLocation (lat, lng parameter order) ──
+    window.updateRoverLocation = function(lat, lng) {
+        currentPos = [lat, lng];
+        
+        // Update Bottom Coordinates display
+        document.getElementById('lat-hud').textContent = lat.toFixed(5);
+        document.getElementById('lng-hud').textContent = lng.toFixed(5);
+        
+        // Append path coordinate to breadcrumbs
+        breadcrumbCoords.push(currentPos);
+        if (breadcrumbCoords.length > 1000) {
+            breadcrumbCoords.shift();
+        }
+
+        // Update breadcrumb trails on the Leaflet map
+        if (!pathLine) {
+            pathGlow = L.polyline(breadcrumbCoords, {
+                color: '#3B82F6',
+                weight: 8,
+                opacity: 0.25,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }).addTo(map);
+
+            pathLine = L.polyline(breadcrumbCoords, {
+                color: '#3B82F6',
+                weight: 3.5,
+                opacity: 0.95,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }).addTo(map);
+        } else {
+            pathLine.setLatLngs(breadcrumbCoords);
+            pathGlow.setLatLngs(breadcrumbCoords);
+        }
+        
+        // Create or move Marker
+        if (!roverMarker) {
+            const roverIconHtml = `
+                <div class="rover-custom-marker">
+                    <div class="rover-pulse-ring">
+                        <div class="rover-pulse-dot"></div>
+                    </div>
+                    <div class="rover-compass-heading" id="heading-needle"></div>
+                </div>
+            `;
+            const roverIcon = L.divIcon({
+                html: roverIconHtml,
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            
+            roverMarker = L.marker(currentPos, { icon: roverIcon, zIndexOffset: 1000 }).addTo(map);
+            map.setView(currentPos, 18);
+        } else {
+            roverMarker.setLatLng(currentPos);
+        }
+        
+        // Rotate heading needle directly
+        const needle = document.getElementById('heading-needle');
+        if (needle) {
+            needle.style.transform = `translateX(-50%) rotate(${roverHeading}deg)`;
+        }
+        
+        // Optionally auto-pan to new coordinates if follow camera toggled
+        if (isFollowing) {
+            map.panTo(currentPos, { animate: true, duration: 0.8 });
+        }
+    }
+
+    // ── GPS SATELLITE/VECTOR LAYERS QUICK TOGGLE BUTTON ───────────────────
+    function toggleMapStyle() {
+        if (!map) return;
+        
+        const btn = document.getElementById('btn-layers');
+        if (activeLayerName === 'streets') {
+            if (map.hasLayer(osmLayer)) map.removeLayer(osmLayer);
+            if (!map.hasLayer(esriLayer)) esriLayer.addTo(map);
+            activeLayerName = 'satellite';
+            if (btn) btn.classList.add('active');
+            window.RESCUEBOT_UI?.toast('Switched to Satellite Map', 'success');
+        } else {
+            if (map.hasLayer(esriLayer)) map.removeLayer(esriLayer);
+            if (!map.hasLayer(osmLayer)) osmLayer.addTo(map);
+            activeLayerName = 'streets';
+            if (btn) btn.classList.remove('active');
+            window.RESCUEBOT_UI?.toast('Switched to Tactical Vector Map', 'success');
+        }
+    }
+
+    // ── PLACING LANDMARKS (Custom Markers) ───────────────────────────────
+    function addLandmark(lat, lng, type) {
+        const LANDMARK_CONFIG = {
+            safe:        { color: '#00FF88', label: 'Safe Zone',    emoji: '🛡️' },
+            danger:      { color: '#FF2D55', label: 'Danger Zone',  emoji: '⚠️' },
+            basestation: { color: '#00D4FF', label: 'Base Station', emoji: '📡' },
+            survivor:    { color: '#FF007F', label: 'Survivor SOS', emoji: '🆘' },
+            obstacle:    { color: '#FFB800', label: 'Obstacle',     emoji: '🚧' },
+            supplies:    { color: '#A066FF', label: 'Supplies',     emoji: '📦' },
+            fire:        { color: '#FF5722', label: 'Fire Source',  emoji: '🔥' },
+            gas:         { color: '#E040FB', label: 'Gas Hazard',   emoji: '💀' },
+            water:       { color: '#2196F3', label: 'Water Hazard', emoji: '💧' },
+        };
+        
+        const cfg = LANDMARK_CONFIG[type];
+        if (!cfg) return;
+
+        const idx = landmarks.length + 1;
+        const name = `${cfg.label} #${idx}`;
+
+        const markerHtml = `
+            <div style="
+                width:24px; height:24px;
+                background:${cfg.color};
+                border-radius:50% 50% 50% 0;
+                transform:rotate(-45deg);
+                border:2px solid rgba(255,255,255,0.7);
+                box-shadow:0 0 10px ${cfg.color}80;
+                display:flex; align-items:center; justify-content:center;
+            ">
+                <span style="transform:rotate(45deg); font-size:10px; line-height:1;">${cfg.emoji}</span>
+            </div>
+        `;
+
+        const icon = L.divIcon({
+            html: markerHtml,
+            className: '',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+        });
+
+        const popupContent = `
+            <div style="font-family:'Inter',sans-serif; color:#EFF2F7; background:#151C2C; padding:4px 8px; border-radius:6px;">
+                <strong style="color:${cfg.color}; display:flex; align-items:center; gap:4px;">
+                    <span>${cfg.emoji}</span> ${name}
+                </strong>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#8E9BB5; margin-top:2px;">
+                    ${lat.toFixed(6)}°, ${lng.toFixed(6)}°
+                </div>
+            </div>
+        `;
+
+        const marker = L.marker([lat, lng], { icon })
+            .addTo(map)
+            .bindPopup(popupContent, {
+                className: 'rescuebot-popup'
+            });
+
+        landmarks.push({ lat, lng, type, name, marker, color: cfg.color });
+
+        // Reset placing tools button active states
+        const toolBtnIds = {
+            safe: 'btn-safe', danger: 'btn-danger', basestation: 'btn-base-station',
+            survivor: 'btn-survivor', obstacle: 'btn-obstacle', supplies: 'btn-supplies',
+            fire: 'btn-fire', gas: 'btn-gas', water: 'btn-water'
+        };
+        const activeBtnId = toolBtnIds[activeTool];
+        if (activeBtnId) {
+            document.getElementById(activeBtnId)?.classList.remove('active');
+        }
+        activeTool = null;
+        document.getElementById('map-canvas').style.cursor = '';
+        
+        window.RESCUEBOT_UI?.toast(`${name} deployed`, 'success');
+    }
+
+    // ── SETUP MAP OVERLAY / ZOOM / HOVER HANDLERS ─────────────────────────
+    function setupInteractiveHUDControls() {
+        // Zoom triggers
+        document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
+            if (map) map.zoomIn();
+        });
+        document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
+            if (map) map.zoomOut();
+        });
+        
+        // Recenter click
+        document.getElementById('btn-recenter')?.addEventListener('click', () => {
+            if (currentPos) {
+                isFollowing = true;
+                document.getElementById('btn-follow').classList.add('active');
+                if (map) {
+                    map.setView(currentPos, 18, { animate: true });
+                }
+                window.RESCUEBOT_UI?.toast('Recentered & camera follow active', 'success');
+            } else {
+                window.RESCUEBOT_UI?.toast('Waiting for GPS lock coordinates...', 'warning');
+            }
+        });
+
+        // Follow Toggle
+        document.getElementById('btn-follow')?.addEventListener('click', () => {
+            isFollowing = !isFollowing;
+            document.getElementById('btn-follow').classList.toggle('active', isFollowing);
+            if (isFollowing && currentPos) {
+                if (map) map.panTo(currentPos);
+            }
+            window.RESCUEBOT_UI?.toast(isFollowing ? 'Follow camera enabled' : 'Follow camera disabled', isFollowing ? 'success' : 'info');
+        });
+
+        // Clear Path
+        document.getElementById('btn-clear-path')?.addEventListener('click', () => {
+            breadcrumbCoords = [];
+            if (currentPos) {
+                breadcrumbCoords.push(currentPos);
+            }
+            if (pathLine) {
+                pathLine.setLatLngs(breadcrumbCoords);
+                pathGlow.setLatLngs(breadcrumbCoords);
+            }
+            window.RESCUEBOT_UI?.toast('Rover breadcrumb trail cleared', 'info');
+        });
+
+        // Layers toggle click
+        document.getElementById('btn-layers')?.addEventListener('click', toggleMapStyle);
+
+        // Toggle placing tools active state
+        const tacticalTools = [
+            { id: 'btn-safe',            tool: 'safe' },
+            { id: 'btn-danger',          tool: 'danger' },
+            { id: 'btn-base-station',    tool: 'basestation' },
+            { id: 'btn-survivor',        tool: 'survivor' },
+            { id: 'btn-obstacle',        tool: 'obstacle' },
+            { id: 'btn-supplies',        tool: 'supplies' },
+            { id: 'btn-fire',            tool: 'fire' },
+            { id: 'btn-gas',             tool: 'gas' },
+            { id: 'btn-water',           tool: 'water' }
+        ];
+
+        tacticalTools.forEach(({ id, tool }) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            
+            btn.addEventListener('click', () => {
+                if (activeTool === tool) {
+                    activeTool = null;
+                    btn.classList.remove('active');
+                    document.getElementById('map-canvas').style.cursor = '';
+                } else {
+                    tacticalTools.forEach(b => document.getElementById(b.id)?.classList.remove('active'));
+                    activeTool = tool;
+                    btn.classList.add('active');
+                    document.getElementById('map-canvas').style.cursor = 'crosshair';
+                    window.RESCUEBOT_UI?.toast(`Active placing tool: ${tool.toUpperCase()}. Click on map.`, 'info');
+                }
+            });
+        });
+    }
+
+    // ── SETUP MQTT CONNECTOR ───────────────────────────────────────────────
+    function setupMqttConnector() {
+        const mqttCtrl = window.mqttController;
+        if (mqttCtrl) {
+            // Subscribe to both 'telemetry' (for legacy sensor GPS format) and 'gps' (normalized event)
+            mqttCtrl.on('gps', (d) => {
+                if (d) {
+                    const lat = parseFloat(d.lat);
+                    const lng = parseFloat(d.lng);
+                    roverHeading = parseFloat(d.heading) || 0;
+                    
+                    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                        updateRoverLocation(lat, lng);
+                        
+                        // Update GPS status indicators on valid coordinate arrival
+                        const gpsDot = document.getElementById('gps-dot');
+                        const gpsTxt = document.getElementById('gps-status');
+                        if (gpsDot && gpsTxt) {
+                            gpsDot.className = 'status-dot';
+                            gpsTxt.textContent = d.status || '3D GPS FIX';
+                        }
+                    }
+                }
+            });
+
+            mqttCtrl.on('telemetry', (d) => {
+                if (d && d.sensor === 'gps' && d.value) {
+                    const lat = parseFloat(d.value.lat);
+                    const lng = parseFloat(d.value.lng);
+                    roverHeading = parseFloat(d.value.heading) || 0;
+                    
+                    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                        updateRoverLocation(lat, lng);
+                        
+                        // Update GPS status indicators on valid coordinate arrival
+                        const gpsDot = document.getElementById('gps-dot');
+                        const gpsTxt = document.getElementById('gps-status');
+                        if (gpsDot && gpsTxt) {
+                            gpsDot.className = 'status-dot';
+                            gpsTxt.textContent = d.value.status || '3D GPS FIX';
+                        }
+                    }
+                }
+            });
+
+            mqttCtrl.on('statusChanged', (status) => {
+                const dot = document.getElementById('mqtt-dot');
+                if (dot) {
+                    dot.className = 'status-dot mqtt-status-dot ' + status.toLowerCase();
+                }
+                
+                const gpsDot = document.getElementById('gps-dot');
+                const gpsTxt = document.getElementById('gps-status');
+                if (gpsDot && gpsTxt) {
+                    if (status === 'CONNECTED') {
+                        if (!currentPos) {
+                            gpsDot.className = 'status-dot warning';
+                            gpsTxt.textContent = 'ACQUIRING...';
+                        }
+                    } else if (status === 'CONNECTING') {
+                        gpsDot.className = 'status-dot warning';
+                        gpsTxt.textContent = 'CONNECTING...';
+                    } else {
+                        gpsDot.className = 'status-dot offline';
+                        gpsTxt.textContent = 'GPS OFFLINE';
+                    }
+                }
+            });
+        }
+    }
+
+    // ── HELPER: DEFAULTS & MISSION CLOCKS ──────────────────────────────────
+    function startMissionTimer() {
+        missionSecs = 0;
+        missionInterval = setInterval(() => {
+            missionSecs++;
+            const h = String(Math.floor(missionSecs / 3600)).padStart(2, '0');
+            const m = String(Math.floor((missionSecs % 3600) / 60)).padStart(2, '0');
+            const s = String(missionSecs % 60).padStart(2, '0');
+            
+            const timerHUD = document.getElementById('mission-timer-hud');
+            if (timerHUD) timerHUD.textContent = `${h}:${m}:${s}`;
+        }, 1000);
+    }
+    
+    function setupSidebarThemeEvents() {
+        // Clock ticking
+        const clockEl = document.getElementById('mission-clock');
+        if (clockEl) {
+            const tick = () => {
+                clockEl.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            };
+            setInterval(tick, 1000);
+            tick();
+        }
+        
+        // Mobile sidebar trigger
+        const sidebarEl = document.getElementById('sidebar');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const backdrop  = document.getElementById('sidebar-backdrop');
+        
+        if (sidebarEl && mobileBtn && backdrop) {
+            mobileBtn.addEventListener('click', () => {
+                sidebarEl.classList.add('mobile-open');
+                backdrop.classList.add('visible');
+            });
+            backdrop.addEventListener('click', () => {
+                sidebarEl.classList.remove('mobile-open');
+                backdrop.classList.remove('visible');
+            });
+        }
+        
+        // Theme button click toggler
+        const themeBtn = document.getElementById('theme-toggle');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                if (window.RESCUEBOT_UI) {
+                    window.RESCUEBOT_UI.toggleTheme();
+                }
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
+
