@@ -242,10 +242,10 @@ npm run dev
 
 | Member | Role |
 |:---|:---|
-| **Prolayjit Biswas** | Team Lead · Embedded Systems · Hardware Architecture |
-| **Arghya Roy** | Software · Dashboard · IoT Integration |
-| **Papon Chowdhury** | Robotics · Mechanical Assembly · Servo Calibration |
-| **Subhajit Halder** | Research · Documentation · Testing |
+| **Prolayjit Biswas** | Team Lead · Software & IoT Developer |
+| **Arghya** | Hardware Lead · Robotics Builder |
+| **Papapon** | Hardware Assistance & Electronics Lead |
+| **Subhajit Haldar** | Hardware Assistant & Logistics Support |
 
 ---
 
