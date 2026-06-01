@@ -34,6 +34,11 @@ It is tailored to provide real-time situational awareness and physical manipulat
       <td align="center"><img src="demo/rover_demo_front_view.jpg" height="200" alt="Front View"><br><em>Front View</em></td>
       <td align="center"><a href="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4"><img src="demo/rover_demo.jpg" height="200" alt="Movement Test Video"></a><br><em>🎬 Movement Test (Click to Play)</em></td>
     </tr>
+    <tr>
+      <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/arm_camera_movement_demo.mp4" height="200" controls></video><br><em>Arm & Camera Demo</em></td>
+      <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_test.mp4" height="200" controls></video><br><em>RescueBOT Test</em></td>
+      <td align="center"><video src="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_demo.mp4" height="200" controls></video><br><em>General Demo</em></td>
+    </tr>
   </table>
 </div>
 
@@ -49,12 +54,10 @@ https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
     <tr>
       <td align="center"><img src="website/screenshots/home_page.png" height="200" alt="Home Page"><br><em>Home Page</em></td>
       <td align="center"><img src="website/screenshots/dashboard_overview.png" height="200" alt="Dashboard Overview"><br><em>Dashboard Overview</em></td>
-    </tr>
-    <tr>
       <td align="center"><img src="website/screenshots/sensor_telemetry.png" height="200" alt="Sensor Telemetry"><br><em>Sensor Telemetry</em></td>
-      <td align="center"><img src="website/screenshots/map_view.png" height="200" alt="Map View"><br><em>Live GPS Map</em></td>
     </tr>
     <tr>
+      <td align="center"><img src="website/screenshots/map_view.png" height="200" alt="Map View"><br><em>Live GPS Map</em></td>
       <td align="center"><img src="website/screenshots/camera_feed.png" height="200" alt="Camera Feed"><br><em>Camera & AI Feed</em></td>
       <td align="center"><img src="website/screenshots/alert_system.png" height="200" alt="Alert System"><br><em>System Alerts</em></td>
     </tr>
