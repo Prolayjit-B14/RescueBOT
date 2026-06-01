@@ -158,12 +158,10 @@ For detailed instructions, see the [Implementation Guide](docs/09_Implementation
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="hackathon_gallery/team_photo.jpg" width="300" alt="Team Photo"><br><em>Team BOT THINGS</em></td>
-      <td align="center"><img src="hackathon_gallery/zyro_event.jpg" width="300" alt="ZYRO Event Logo"><br><em>ZYRO 2026 Hackathon</em></td>
-    </tr>
-    <tr>
-      <td align="center"><img src="hackathon_gallery/team_selfie.jpg" width="300" alt="Team Selfie"><br><em>Hackathon Selfie</em></td>
-      <td align="center"><img src="hackathon_gallery/zyro_swag.jpg" width="300" alt="ZYRO Swag"><br><em>Event Swag</em></td>
+      <td align="center"><img src="hackathon_gallery/team_selfie.jpg" height="200" alt="Team Selfie"><br><em>Hackathon Selfie</em></td>
+      <td align="center"><img src="hackathon_gallery/team_photo.jpg" height="200" alt="Team Photo"><br><em>Team BOT THINGS</em></td>
+      <td align="center"><img src="hackathon_gallery/zyro_event.jpg" height="200" alt="ZYRO Event Logo"><br><em>ZYRO 2026 Hackathon</em></td>
+      <td align="center"><img src="hackathon_gallery/zyro_swag.jpg" height="200" alt="ZYRO Swag"><br><em>Event Swag</em></td>
     </tr>
   </table>
 </div>
