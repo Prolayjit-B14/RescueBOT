@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="media/logo_RescueBOT.png" width="300" alt="RescueBOT Logo">
   <h1>🤖 RescueBOT</h1>
   <p><b>Intelligent Multi-Disaster Rescue Robotic System</b></p>
   <p><i>A B.Tech Engineering Hackathon Project</i></p>
@@ -12,9 +13,19 @@
 
 ## 📖 About The Project
 
+<div align="center">
+  <img src="demo/rescuebot_full_assembly.jpg" alt="RescueBOT Prototype" width="800">
+</div>
+
 **RescueBOT** is an advanced, IoT-enabled multi-disaster rescue robotic system designed for hazardous environments where human intervention is dangerous or impossible. Built primarily with ESP32 microcontrollers, this rover platform integrates a robotic arm, real-time AI-assisted detection (Human/Fire), extensive sensor monitoring, and a robust hybrid communication system (NRF24L01 + LoRa + MQTT). 
 
 It is tailored to provide real-time situational awareness and physical manipulation capabilities to first responders during earthquakes, fires, and industrial disasters.
+
+## 🎥 Project Demo
+
+Check out our demonstration video from the hackathon:
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
 
 ## ✨ Key Features
 
@@ -132,6 +143,10 @@ For detailed instructions, see the [Implementation Guide](docs/09_Implementation
    *(Note: The dedicated Web Dashboard repository can be found here: [Diaster_Rover_Dashboard](https://github.com/Prolayjit-B14/Diaster_Rover_Dashboard))*
 
 ## 👥 Team
+
+<div align="center">
+  <img src="hackathon_gallery/team_photo.jpg" alt="Team BOT THINGS" width="600">
+</div>
 
 Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Students.
 
