@@ -39,20 +39,6 @@ It is tailored to provide real-time situational awareness and physical manipulat
   </table>
 </div>
 
-## 🎥 Video Demonstrations
-
-Watch the robot in action during our physical field testing:
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_demo.mp4
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_test.mp4
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/arm_camera_movement_demo.mp4
-
 ## 💻 Web Dashboard Interface
 
 <div align="center">
