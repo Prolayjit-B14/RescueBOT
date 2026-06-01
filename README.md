@@ -76,16 +76,25 @@ It is tailored to provide real-time situational awareness and physical manipulat
 
 ```mermaid
 graph TD
-    A[Remote Controller<br>Arduino Nano] -->|nRF24L01<br>2.4GHz RF| B(Rover Main Control<br>Arduino Nano)
-    B -->|PWM| C[Motor Drivers & Servos]
+    subgraph Operations Center
+        F[Base Station Receiver<br>ESP32] -->|USB Serial| H[Web Dashboard<br>PC / Browser]
+        H <-->|TensorFlow.js| I[AI Detection<br>Human & Fire]
+    end
+
+    subgraph Actuation Network
+        A[Remote Controller<br>Arduino Nano] -->|nRF24L01<br>2.4 GHz RF| B(Rover Main Drive<br>Arduino Nano)
+        B -->|PWM| C[L298N Motor Driver<br>4x DC Motors]
+        B -->|PWM| S[4-DOF Robotic Arm<br>MG90S/SG90 Servos]
+    end
     
-    D[Sensors<br>Gas, Temp, IMU] -->|Analog/I2C| E(Telemetry Node<br>ESP32)
-    E -->|LoRa 433MHz| F[Base Station Receiver<br>ESP32]
+    subgraph Telemetry Network
+        D[Sensors: Gas, Flame, Vib,<br>Sonar, MPU6050, GPS] -->|GPIO/I2C/UART| E(Telemetry Node<br>ESP32)
+        E -->|SX1278 LoRa<br>433 MHz| F
+    end
     
-    G[ESP32-CAM<br>Vision Node] -->|Wi-Fi HTTP<br>MJPEG| H[Web Dashboard UI]
-    F -->|Serial/USB| H
-    
-    H -->|TensorFlow.js| I[AI Human/Fire Detection]
+    subgraph Vision Network
+        G[ESP32-CAM<br>Vision Node] -->|Wi-Fi HTTP<br>MJPEG Stream| H
+    end
 ```
 
 ## 📂 Repository Structure
