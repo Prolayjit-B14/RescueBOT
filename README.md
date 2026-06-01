@@ -44,6 +44,7 @@ It is tailored to provide real-time situational awareness and physical manipulat
     </tr>
   </table>
 </div>
+
 ## 💻 Web Dashboard Interface
 
 <div align="center">
@@ -60,6 +61,7 @@ It is tailored to provide real-time situational awareness and physical manipulat
     </tr>
   </table>
 </div>
+
 ## ✨ Key Features
 
 - **📊 Multi-Sensor Environmental Telemetry Array**: Aggregates gas (MQ-2), vibration (SW-420), dual flame (KY-026), obstacle (HC-SR04), and tilt (MPU6050) data, plus live GPS coordinates.
