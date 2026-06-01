@@ -21,6 +21,19 @@
 
 It is tailored to provide real-time situational awareness and physical manipulation capabilities to first responders during earthquakes, fires, and industrial disasters.
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="demo/rover_demo_isometric_view.jpg" width="250" alt="Isometric View"><br><em>Isometric View</em></td>
+      <td align="center"><img src="demo/rover_and_remote_controller.jpg" width="250" alt="Remote Controller"><br><em>Rover & Remote</em></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="demo/robotic_arm_gripper.jpg" width="250" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
+      <td align="center"><img src="demo/rover_camera_led_flash.jpg" width="250" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
+    </tr>
+  </table>
+</div>
+
 ## 🎥 Project Demo
 
 Check out our demonstration video from the hackathon:
@@ -153,5 +166,7 @@ Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Studen
 **Contributors:**
 - [Prolayjit-B14](https://github.com/Prolayjit-B14)
 - [Arghya015](https://github.com/Arghya015)
+- Subhajit Halder
+- Papan Cssius
 
 See [Team Details](docs/13_Team_Details.md) for full member info and academic details.
