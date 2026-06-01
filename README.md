@@ -66,12 +66,12 @@ https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
 </div>
 ## ✨ Key Features
 
-- **🦾 Robotic Arm & Rover Platform**: Agile movement across rough terrain with a manipulator arm for moving debris or delivering payloads.
-- **📡 Hybrid Communication**: Utilizes NRF24L01 for short-range low-latency control, LoRa for long-range telemetry, and MQTT for web dashboard connectivity.
-- **👁️ AI-Assisted Detection**: Real-time Human and Fire detection via ESP32-CAM video streaming.
-- **🌍 Live GPS Tracking**: Pinpoints the exact location of the rover in disaster zones.
-- **📊 Comprehensive Sensor Suite**: Monitors Gas, Temperature, Vibration, Flame, and Obstacles (Ultrasonic).
-- **💻 Web Dashboard**: Real-time telemetry, video feed, and hazard alerts accessible from any browser.
+- **📊 Multi-Sensor Environmental Telemetry Array**: Aggregates gas (MQ-2), vibration (SW-420), dual flame (KY-026), obstacle (HC-SR04), and tilt (MPU6050) data, plus live GPS coordinates.
+- **👁️ Standalone Visual Surveillance System**: Dedicated ESP32-CAM providing an independent MJPEG live video stream and high-power PWM flash LED for low-light environments.
+- **🦾 Drive Control & Actuation System**: 4WD differential drive chassis paired with a 4-DOF robotic arm (MG90S/SG90 servos) and a continuous sweeping sonar.
+- **📡 Dual-Band Wireless Communication**: NRF24L01+ (2.4 GHz) for low-latency robotic control and LoRa SX1278 (433 MHz) for long-range sensor telemetry.
+- **🚨 Local Safety & Alert System**: Autonomous on-board evaluation with physical red/green status LEDs, active buzzer alarm, and a 500 ms drive fail-safe.
+- **💻 Web Dashboard & Telemetry Monitoring**: Real-time interface rendering live sensor gauges, alert statuses, GPS map views, and the live camera feed.
 
 ## 🛠️ Technology Stack
 
