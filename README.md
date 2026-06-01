@@ -7,6 +7,7 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
   [![ESP32](https://img.shields.io/badge/ESP32-Supported-red.svg)]()
   [![IoT](https://img.shields.io/badge/IoT-Enabled-green.svg)]()
+  [![Live Demo](https://img.shields.io/badge/Live_Dashboard-Vercel-black.svg?logo=vercel)](https://diaster-rover-dashboard.vercel.app/)
 </div>
 
 ---
@@ -37,6 +38,9 @@ It is tailored to provide real-time situational awareness and physical manipulat
 </div>
 
 ## 💻 Web Dashboard Interface
+
+> **🌐 Live Demo:** [https://diaster-rover-dashboard.vercel.app/](https://diaster-rover-dashboard.vercel.app/)
+
 
 <div align="center">
   <table>
@@ -76,24 +80,32 @@ It is tailored to provide real-time situational awareness and physical manipulat
 
 ```mermaid
 graph TD
+    %% Define Styles
+    classDef ui fill:#2b3a42,stroke:#3f5765,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef mcu fill:#8b3d56,stroke:#a64b68,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef sensor fill:#3c6e71,stroke:#4b8a8e,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef actuator fill:#d96c06,stroke:#f27b08,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+    classDef ai fill:#512b58,stroke:#6f3b79,stroke-width:2px,color:#fff,rx:5px,ry:5px;
+
+    %% Subgraphs
     subgraph Operations Center
-        F[Base Station Receiver<br>ESP32] -->|USB Serial| H[Web Dashboard<br>PC / Browser]
-        H <-->|TensorFlow.js| I[AI Detection<br>Human & Fire]
+        F[Base Station Receiver<br>ESP32]:::mcu -->|USB Serial| H[Web Dashboard<br>PC / Browser]:::ui
+        H <-->|TensorFlow.js| I[AI Detection<br>Human & Fire]:::ai
     end
 
     subgraph Actuation Network
-        A[Remote Controller<br>Arduino Nano] -->|nRF24L01<br>2.4 GHz RF| B(Rover Main Drive<br>Arduino Nano)
-        B -->|PWM| C[L298N Motor Driver<br>4x DC Motors]
-        B -->|PWM| S[4-DOF Robotic Arm<br>MG90S/SG90 Servos]
+        A[Remote Controller<br>Arduino Nano]:::mcu -->|nRF24L01<br>2.4 GHz RF| B(Rover Main Drive<br>Arduino Nano):::mcu
+        B -->|PWM| C[L298N Motor Driver<br>4x DC Motors]:::actuator
+        B -->|PWM| S[4-DOF Robotic Arm<br>MG90S/SG90 Servos]:::actuator
     end
     
     subgraph Telemetry Network
-        D[Sensors: Gas, Flame, Vib,<br>Sonar, MPU6050, GPS] -->|GPIO/I2C/UART| E(Telemetry Node<br>ESP32)
+        D[Sensors: Gas, Flame, Vib,<br>Sonar, MPU6050, GPS]:::sensor -->|GPIO/I2C/UART| E(Telemetry Node<br>ESP32):::mcu
         E -->|SX1278 LoRa<br>433 MHz| F
     end
     
     subgraph Vision Network
-        G[ESP32-CAM<br>Vision Node] -->|Wi-Fi HTTP<br>MJPEG Stream| H
+        G[ESP32-CAM<br>Vision Node]:::mcu -->|Wi-Fi HTTP<br>MJPEG Stream| H
     end
 ```
 
