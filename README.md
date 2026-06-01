@@ -25,16 +25,13 @@ It is tailored to provide real-time situational awareness and physical manipulat
       <td align="center"><img src="demo/rescuebot_full_assembly.jpg" height="150" alt="Full Assembly"><br><em>Full Assembly</em></td>
       <td align="center"><img src="demo/rover_and_remote_controller.jpg" height="150" alt="Remote Controller"><br><em>Rover & Remote</em></td>
       <td align="center"><img src="demo/demo.jpg" height="150" alt="Field Testing"><br><em>Field Testing</em></td>
+      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" height="150" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
     </tr>
     <tr>
-      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" height="150" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
       <td align="center"><img src="demo/robotic_arm_gripper.jpg" height="150" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
       <td align="center"><img src="demo/rover_camera_led_flash.jpg" height="150" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
-    </tr>
-    <tr>
       <td align="center"><img src="demo/rover_demo_isometric_view.jpg" height="150" alt="Isometric View"><br><em>Isometric View</em></td>
       <td align="center"><img src="demo/rover_demo_front_view.jpg" height="150" alt="Front View"><br><em>Front View</em></td>
-      <td align="center"><img src="demo/rover_demo.jpg" height="150" alt="Demo Thumbnail"><br><em>Demo Thumbnail</em></td>
     </tr>
   </table>
 </div>
