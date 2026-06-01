@@ -17,6 +17,8 @@
 
 It is tailored to provide real-time situational awareness and physical manipulation capabilities to first responders during earthquakes, fires, and industrial disasters.
 
+## 🎥 Project Demo
+
 <div align="center">
   <table>
     <tr>
@@ -42,12 +44,6 @@ It is tailored to provide real-time situational awareness and physical manipulat
     </tr>
   </table>
 </div>
-
-## 🎥 Project Demo
-
-Check out our demonstration video from the hackathon:
-
-https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
 ## 💻 Web Dashboard Interface
 
 <div align="center">
