@@ -13,10 +13,6 @@
 
 ## 📖 About The Project
 
-<div align="center">
-  <img src="demo/rescuebot_full_assembly.jpg" alt="RescueBOT Prototype" width="800">
-</div>
-
 **RescueBOT** is an advanced, IoT-enabled multi-disaster rescue robotic system designed for hazardous environments where human intervention is dangerous or impossible. Built primarily with ESP32 microcontrollers, this rover platform integrates a robotic arm, real-time AI-assisted detection (Human/Fire), extensive sensor monitoring, and a robust hybrid communication system (NRF24L01 + LoRa + MQTT). 
 
 It is tailored to provide real-time situational awareness and physical manipulation capabilities to first responders during earthquakes, fires, and industrial disasters.
@@ -24,12 +20,14 @@ It is tailored to provide real-time situational awareness and physical manipulat
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="demo/rover_demo_isometric_view.jpg" width="250" alt="Isometric View"><br><em>Isometric View</em></td>
-      <td align="center"><img src="demo/rover_and_remote_controller.jpg" width="250" alt="Remote Controller"><br><em>Rover & Remote</em></td>
+      <td align="center"><img src="demo/rescuebot_full_assembly.jpg" width="250" alt="Full Assembly"><br><em>Full Assembly</em></td>
+      <td align="center"><img src="demo/rover_demo_front_view.jpg" width="250" alt="Front View"><br><em>Front View</em></td>
+      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" width="250" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
     </tr>
     <tr>
       <td align="center"><img src="demo/robotic_arm_gripper.jpg" width="250" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
       <td align="center"><img src="demo/rover_camera_led_flash.jpg" width="250" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
+      <td align="center"><a href="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4"><img src="demo/rover_demo.jpg" width="250" alt="Movement Test Video"></a><br><em>🎬 Movement Test (Click to Play)</em></td>
     </tr>
   </table>
 </div>
