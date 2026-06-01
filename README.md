@@ -21,12 +21,17 @@ It is tailored to provide real-time situational awareness and physical manipulat
   <table>
     <tr>
       <td align="center"><img src="demo/rescuebot_full_assembly.jpg" width="250" alt="Full Assembly"><br><em>Full Assembly</em></td>
+      <td align="center"><img src="demo/rover_demo_isometric_view.jpg" width="250" alt="Isometric View"><br><em>Isometric View</em></td>
       <td align="center"><img src="demo/rover_demo_front_view.jpg" width="250" alt="Front View"><br><em>Front View</em></td>
-      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" width="250" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
     </tr>
     <tr>
+      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" width="250" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
       <td align="center"><img src="demo/robotic_arm_gripper.jpg" width="250" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
       <td align="center"><img src="demo/rover_camera_led_flash.jpg" width="250" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="demo/rover_and_remote_controller.jpg" width="250" alt="Remote Controller"><br><em>Rover & Remote</em></td>
+      <td align="center"><img src="demo/demo.jpg" width="250" alt="Field Testing"><br><em>Field Testing</em></td>
       <td align="center"><a href="https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4"><img src="demo/rover_demo.jpg" width="250" alt="Movement Test Video"></a><br><em>🎬 Movement Test (Click to Play)</em></td>
     </tr>
   </table>
@@ -168,7 +173,7 @@ Built with ❤️ by **Team BOT THINGS**, a group of 4 B.Tech Engineering Studen
 - [Prolayjit-B14](https://github.com/Prolayjit-B14)
 - [Arghya015](https://github.com/Arghya015)
 - Subhajit Halder
-- Papan Cssius
+- Papan Chowdhury
 
 See [Team Details](docs/13_Team_Details.md) for full member info and academic details.
 
