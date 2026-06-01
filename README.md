@@ -17,33 +17,41 @@
 
 It is tailored to provide real-time situational awareness and physical manipulation capabilities to first responders during earthquakes, fires, and industrial disasters.
 
-## 🎥 Project Demo
+## 📸 Hardware Gallery
 
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="demo/rescuebot_full_assembly.jpg" height="120" alt="Full Assembly"><br><em>Full Assembly</em></td>
-      <td align="center"><img src="demo/rover_and_remote_controller.jpg" height="120" alt="Remote Controller"><br><em>Rover & Remote</em></td>
-      <td align="center"><img src="demo/demo.jpg" height="120" alt="Field Testing"><br><em>Field Testing</em></td>
-      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" height="120" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
-      <td align="center"><img src="demo/robotic_arm_gripper.jpg" height="120" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
+      <td align="center"><img src="demo/rescuebot_full_assembly.jpg" height="150" alt="Full Assembly"><br><em>Full Assembly</em></td>
+      <td align="center"><img src="demo/rover_and_remote_controller.jpg" height="150" alt="Remote Controller"><br><em>Rover & Remote</em></td>
+      <td align="center"><img src="demo/demo.jpg" height="150" alt="Field Testing"><br><em>Field Testing</em></td>
     </tr>
     <tr>
-      <td align="center"><img src="demo/rover_camera_led_flash.jpg" height="120" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
-      <td align="center"><img src="demo/rover_demo_isometric_view.jpg" height="120" alt="Isometric View"><br><em>Isometric View</em></td>
-      <td align="center"><img src="demo/rover_demo_front_view.jpg" height="120" alt="Front View"><br><em>Front View</em></td>
-      <td align="center"><img src="demo/rover_demo.jpg" height="120" alt="Demo Thumbnail"><br><em>Demo Thumbnail</em></td>
-      <td align="center"><video src="demo/rover_movement_test.mp4" height="120" controls muted></video><br><em>Movement Test</em></td>
+      <td align="center"><img src="demo/rover_with_robotic_arm.jpg" height="150" alt="Rover with Arm"><br><em>Rover with Arm</em></td>
+      <td align="center"><img src="demo/robotic_arm_gripper.jpg" height="150" alt="Robotic Arm"><br><em>Robotic Arm Gripper</em></td>
+      <td align="center"><img src="demo/rover_camera_led_flash.jpg" height="150" alt="Camera & Flash"><br><em>Camera & LED Flash</em></td>
     </tr>
     <tr>
-      <td align="center"><video src="demo/arm_camera_movement_demo.mp4" height="120" controls muted></video><br><em>Arm Demo</em></td>
-      <td align="center"><video src="demo/rescuebot_test.mp4" height="120" controls muted></video><br><em>Test</em></td>
-      <td align="center"><video src="demo/rescuebot_demo.mp4" height="120" controls muted></video><br><em>Gen Demo</em></td>
-      <td align="center"><video src="demo/rescuebot_overview.mp4" height="120" controls muted></video><br><em>Overview</em></td>
-      <td></td>
+      <td align="center"><img src="demo/rover_demo_isometric_view.jpg" height="150" alt="Isometric View"><br><em>Isometric View</em></td>
+      <td align="center"><img src="demo/rover_demo_front_view.jpg" height="150" alt="Front View"><br><em>Front View</em></td>
+      <td align="center"><img src="demo/rover_demo.jpg" height="150" alt="Demo Thumbnail"><br><em>Demo Thumbnail</em></td>
     </tr>
   </table>
 </div>
+
+## 🎥 Video Demonstrations
+
+Watch the robot in action during our physical field testing:
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_overview.mp4
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_demo.mp4
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rescuebot_test.mp4
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/rover_movement_test.mp4
+
+https://github.com/Prolayjit-B14/RescueBOT/raw/main/demo/arm_camera_movement_demo.mp4
 
 ## 💻 Web Dashboard Interface
 
