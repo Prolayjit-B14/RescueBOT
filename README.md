@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="media/logo_RescueBOT.png" width="300" alt="RescueBOT Logo">
+  <img src="logo_RescueBOT.png" width="300" alt="RescueBOT Logo">
   <h1>🤖 RescueBOT</h1>
   <p><b>Intelligent Multi-Disaster Rescue Robotic System</b></p>
   <p><i>A B.Tech Engineering Hackathon Project</i></p>
@@ -211,6 +211,10 @@ See [Team Details](docs/13_Team_Details.md) for full member info and academic de
 
 - **ZYRO 2026 Hackathon**: For providing the platform and inspiration to build this prototype.
 - **Kalyani Government Engineering College (KGEC)**: For the resources and continued support.
+- **Open Source Community**: For the foundational libraries, frameworks, and tools that made this project possible.
+- **YouTube Creators & Tutorials**: For invaluable troubleshooting advice and hardware integration guidance.
+- **Datasheets & Documentation**: For the comprehensive technical specifications provided by Espressif, Arduino, and various sensor manufacturers.
+- **IEEE Papers & Journals**: For the foundational research and academic inspiration in disaster robotics and IoT telemetry networks.
 
 ---
 <div align="center">
